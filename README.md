@@ -7,5 +7,6 @@
 - User authentication (signup, login, logout).
 - Product listing with details (name, description, price).
 - Cart functionality (add/remove items).
+
 - Checkout process.
 - User-specific order history.
