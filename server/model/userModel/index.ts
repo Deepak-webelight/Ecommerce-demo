@@ -4,6 +4,7 @@ export interface IUserModel {
   Name: string;
   Email: string;
   Password: string;
+  access_token: string;
 }
 
 interface IUserModelSchema extends IUserModel, Document {}
@@ -19,6 +20,10 @@ const userModelSchema = new Schema<IUserModelSchema>(
       required: true,
     },
     Password: {
+      type: String,
+      required: true,
+    },
+    access_token: {
       type: String,
       required: true,
     },

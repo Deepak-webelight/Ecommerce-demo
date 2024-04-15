@@ -22,6 +22,14 @@ const UserLoginController = async (req: Request, res: Response) => {
       Email: CurrentUser.Email,
       Name: CurrentUser.Name,
     });
+    await UserModel.findOneAndUpdate(
+      {
+        Email,
+      },
+      {
+        $set: { access_token: token },
+      }
+    );
 
     return responseProvider.sendResponse({
       message: "Login Successful",

@@ -2,9 +2,12 @@ import { Router } from "express";
 import AddNewUserHandler from "../../controller/auth/AddNewUserHandler";
 import varifySignupRequestBody from "../../middleware/auth/varifySignupRequestBody";
 import varifyUserAlreadyExist from "../../middleware/auth/varifyUserAlreadyExist";
-import varifyLoginRequestBody from "../../middleware/varifyLoginRequestBody";
 import UserLoginController from "../../controller/auth/UserLoginController";
 import varifyUserDoesNotExist from "../../middleware/auth/varifyUserDoesNotExist";
+import varifyLoginRequestBody from "../../middleware/auth/varifyLoginRequestBody";
+import varifyAuthToken from "../../middleware/auth/varifyAuthToken";
+import UserLogoutController from "../../controller/auth/UserLogoutController";
+import UserRefreshTokenController from "../../controller/auth/UserRefreshTokenController";
 
 const authRoutes = Router();
 
@@ -33,5 +36,11 @@ authRoutes.post(
   varifyUserDoesNotExist,
   UserLoginController
 );
+
+// user logout route
+authRoutes.get("/logout", varifyAuthToken, UserLogoutController);
+
+// refresh token route
+authRoutes.get("/refresh", varifyAuthToken, UserRefreshTokenController);
 
 export default authRoutes;

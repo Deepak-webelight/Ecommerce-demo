@@ -7,15 +7,17 @@ import tokenHandler from "../../../utils/tokenHandler";
 const AddNewUserHandler = async (req: Request, res: Response) => {
   try {
     const { Name, Email, Password }: IsignupRequestbody = req.body;
+    
+    const token = tokenHandler.generageToken({ Email, Name });
 
     const newUser = new UserModel({
       Name,
       Email,
       Password,
+      access_token : token
     });
     newUser.save();
 
-    const token = tokenHandler.generageToken({ Email, Name });
 
     responseProvider.sendResponse({
       message: "User Created Successfully",

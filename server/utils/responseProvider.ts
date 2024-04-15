@@ -12,6 +12,7 @@ interface IsendResponse {
   message: string;
   statusCode: number;
   data?: ServerResponseData;
+  tokenExpire?: boolean;
 }
 
 interface IInternalServerError {

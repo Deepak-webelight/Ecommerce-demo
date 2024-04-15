@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import responseProvider from "../../utils/responseProvider";
-import { ILoginRequestbody } from "../../routes/auth";
+import { ILoginRequestbody } from "../../../routes/auth";
+import responseProvider from "../../../utils/responseProvider";
 
 const varifyLoginRequestBody = (
   req: Request,
@@ -32,4 +32,4 @@ const varifyLoginRequestBody = (
   }
 };
 
-export default varifyLoginRequestBody
+export default varifyLoginRequestBody;
