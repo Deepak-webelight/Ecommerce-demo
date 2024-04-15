@@ -1,6 +1,11 @@
 import { Response } from "express";
 
-type ServerResponseData = any; // todo
+// login/sign dataResponse
+interface LoginsignupDataResponse {
+  access_token: string;
+}
+
+type ServerResponseData = LoginsignupDataResponse | any; // todo
 
 interface IsendResponse {
   response: Response;
@@ -12,6 +17,7 @@ interface IsendResponse {
 interface IInternalServerError {
   response: Response;
   message?: string;
+  error: Error;
 }
 
 interface IresponseProvider {
@@ -26,7 +32,9 @@ const responseProvider: IresponseProvider = {
       data,
     });
   },
-  InternalServerError: ({ response, message }) => {
+  InternalServerError: ({ response, message, error }) => {
+    console.log(error);
+
     response
       .status(500)
       .set("Content-Type", "application/json")

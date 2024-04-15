@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import responseProvider from "../../../utils/responseProvider";
 import { IsignupRequestbody } from "../../../routes/auth";
 import UserModel from "../../../model/userModel";
+import tokenHandler from "../../../utils/tokenHandler";
 
 const AddNewUserHandler = async (req: Request, res: Response) => {
   try {
@@ -14,15 +15,21 @@ const AddNewUserHandler = async (req: Request, res: Response) => {
     });
     newUser.save();
 
-    console.log(newUser);
+    const token = tokenHandler.generageToken({ Email, Name });
 
     responseProvider.sendResponse({
       message: "User Created Successfully",
       response: res,
       statusCode: 200,
+      data: {
+        access_token: token,
+      },
     });
   } catch (err) {
-    return responseProvider.InternalServerError({ response: res });
+    return responseProvider.InternalServerError({
+      response: res,
+      error: err as Error,
+    });
   }
 };
 

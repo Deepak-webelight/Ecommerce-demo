@@ -1,21 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import responseProvider from "../../../utils/responseProvider";
-import { IsignupRequestbody } from "../../../routes/auth";
+import responseProvider from "../../utils/responseProvider";
+import { ILoginRequestbody } from "../../routes/auth";
 
-const varifySignupRequestBody = (
+const varifyLoginRequestBody = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { Email, Name, Password }: IsignupRequestbody = req.body;
-
-    if (!Name)
-      return responseProvider.sendResponse({
-        message: "Bad Request | Invalid Name",
-        response: res,
-        statusCode: 400,
-      });
+    const { Email, Password }: ILoginRequestbody = req.body;
 
     if (!Email)
       return responseProvider.sendResponse({
@@ -39,4 +32,4 @@ const varifySignupRequestBody = (
   }
 };
 
-export default varifySignupRequestBody;
+export default varifyLoginRequestBody

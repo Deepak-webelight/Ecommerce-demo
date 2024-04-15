@@ -11,7 +11,7 @@ const varifyUserAlreadyExist = async (
   try {
     const { Email }: IsignupRequestbody = req.body;
 
-    const response = await UserModel.findOne({ Email });
+    const response = await UserModel.exists({ Email });
 
     if (!response) return next();
     else
@@ -20,8 +20,11 @@ const varifyUserAlreadyExist = async (
         response: res,
         statusCode: 400,
       });
-  } catch {
-    return responseProvider.InternalServerError({ response: res });
+  } catch (err) {
+    return responseProvider.InternalServerError({
+      response: res,
+      error: err as Error,
+    });
   }
 };
 
