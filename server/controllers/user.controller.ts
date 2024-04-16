@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import { UserService } from "../services/user.service";
 import responseProvider from "../utils/responseProvider.utils";
-import tokenHandler from "../utils/tokenHandler.utils";
+import tokenHandler, { IgenerageTokenInput } from "../utils/tokenHandler.utils";
 
 const userService = new UserService();
 
@@ -17,6 +17,7 @@ export class UserController {
         name,
         email,
         password,
+        access_token: null,
       });
 
       // if user service have some error
@@ -33,8 +34,8 @@ export class UserController {
         userId: newUser._id,
       });
 
-      // // update user data :todo
-      // await userService.updateUserData({ email }, { access_token: token });
+      // update user data :todo
+      await userService.updateUserData({ email }, { access_token: token });
 
       return responseProvider.sendResponse({
         message: "User Created Successfully",
@@ -70,8 +71,8 @@ export class UserController {
         userId: user._id,
       });
 
-      // // update user data :todo
-      // await userService.updateUserData({ email }, { access_token: token });
+      // update user data :todo
+      await userService.updateUserData({ email }, { access_token: token });
 
       return responseProvider.sendResponse({
         message: "Login Successful",
@@ -96,8 +97,12 @@ export class UserController {
       const token = (authorization as string)?.split(" ")[1];
 
       // update user data :todo
-      //  await userService.updateUserData({ email }, { access_token: token });
+     await userService.updateUserData(
+        { access_token: token },
+        { access_token: "" }
+      );
 
+     
       return responseProvider.sendResponse({
         message: "Logout Successful",
         response: res,
@@ -105,6 +110,40 @@ export class UserController {
       });
     } catch (err) {
       console.log(err);
+      return responseProvider.InternalServerError({
+        error: err as Error,
+        response: res,
+      });
+    }
+  }
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const { authorization } = req.headers;
+
+      const token = (authorization as string)?.split(" ")[1];
+
+      const tokenData = (await tokenHandler.verifyToken(
+        token
+      )) as IgenerageTokenInput;
+
+      const newToken = await tokenHandler.generageToken({
+        userId: tokenData.userId,
+      });
+
+      await userService.updateUserData(
+        { _id: tokenData.userId },
+        { access_token: newToken }
+      );
+
+      return responseProvider.sendResponse({
+        message: "token refreshed",
+        response: res,
+        statusCode: 200,
+        data: {
+          access_token: newToken,
+        },
+      });
+    } catch (err) {
       return responseProvider.InternalServerError({
         error: err as Error,
         response: res,

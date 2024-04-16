@@ -28,6 +28,7 @@ export class UserService {
     email,
     name,
     password,
+    access_token,
   }: IResisterRequestbody): Promise<IuserDocument | Error> {
     try {
       // Check if user already exists
@@ -36,7 +37,12 @@ export class UserService {
         return Error("User already exists");
       }
       // register as new user
-      const registeredUser = await new userModel({ email, name, password });
+      const registeredUser = await new userModel({
+        email,
+        name,
+        password,
+        access_token,
+      });
       const savedUser = registeredUser.save();
 
       return savedUser;
@@ -73,11 +79,23 @@ export class UserService {
         searchQuery,
         filterQuery
       );
+      console.log("response", response, searchQuery, filterQuery);
 
       if (response) return response;
       else return Error("user update failed");
     } catch (err) {
       throw new Error((err as Error).message);
+    }
+  }
+  async findUserData(
+    searchQuery: IUserSearchQuery
+  ): Promise<IuserDocument | Error> {
+    try {
+      const response = await userModel.findOne(searchQuery);
+      if (response) return response;
+      else return Error("user not found");
+    } catch (err) {
+      return Error((err as Error).message);
     }
   }
 }

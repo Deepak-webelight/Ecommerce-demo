@@ -11,6 +11,7 @@ export interface IResisterRequestbody {
   name: string;
   email: string;
   password: string;
+  access_token?: string | null 
 }
 
 userRoutes.post(
@@ -35,14 +36,13 @@ userRoutes.get(
   "/logout",
   usermiddlware.varifyAuthToken,
   userController.userLogout
-
-  // varifyAuthToken, UserLogoutController
 );
 
 // refresh token route
 userRoutes.get(
-  "/refresh"
-  // varifyAuthToken, UserRefreshTokenController
+  "/refresh",
+  usermiddlware.varifyAuthToken,
+  userController.refreshToken
 );
 
 export default userRoutes;

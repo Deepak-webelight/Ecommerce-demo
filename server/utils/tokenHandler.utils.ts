@@ -20,7 +20,6 @@ const tokenHandler: ItokenHandler = {
   },
   verifyToken: async (token) => {
     if (!envProvider.jwtSecret) throw Error("Invalid token secret");
-
     try {
       return await jwt.verify(token, envProvider.jwtSecret);
     } catch (err) {
