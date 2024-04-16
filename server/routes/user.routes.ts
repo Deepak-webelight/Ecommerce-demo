@@ -21,19 +21,18 @@ userRoutes.post(
 
 // user Login route
 export interface ILoginRequestbody {
-  Email: string;
-  Password: string;
+  email: string;
+  password: string;
 }
 userRoutes.post(
-  "/login"
-  //   varifyLoginRequestBody,
-  //   varifyUserDoesNotExist,
-  //   UserLoginController
+  "/login",
+  usermiddlware.varifyLoginRequestBody,
+  userController.userLogin
 );
 
 // user logout route
 userRoutes.get(
-  "/logout"
+  "/logout",
   // varifyAuthToken, UserLogoutController
 );
 

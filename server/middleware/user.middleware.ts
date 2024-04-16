@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IResisterRequestbody } from "../routes/user.routes";
+import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import responseProvider from "../utils/responseProvider.utils";
 
 export class UserMiddleware {
@@ -20,6 +20,37 @@ export class UserMiddleware {
           statusCode: 400,
         });
 
+      if (!email)
+        return responseProvider.sendResponse({
+          message: "Bad Request | Invalid email",
+          response: res,
+          statusCode: 400,
+        });
+      if (!password)
+        return responseProvider.sendResponse({
+          message: "Bad Request | Invalid password",
+          response: res,
+          statusCode: 400,
+        });
+
+      next();
+    } catch (err) {
+      return responseProvider.InternalServerError({
+        response: res,
+        error: err as Error,
+      });
+    }
+  }
+  async varifyLoginRequestBody(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // Extract user data from request body
+      const { email, password }: ILoginRequestbody = req.body;
+
+      // validate email and password
       if (!email)
         return responseProvider.sendResponse({
           message: "Bad Request | Invalid email",

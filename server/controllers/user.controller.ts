@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { IResisterRequestbody } from "../routes/user.routes";
+import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import { UserService } from "../services/user.service";
 import responseProvider from "../utils/responseProvider.utils";
 import tokenHandler from "../utils/tokenHandler.utils";
@@ -45,6 +45,41 @@ export class UserController {
       return responseProvider.InternalServerError({
         response: res,
         error: err as Error,
+      });
+    }
+  }
+  async userLogin(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password }: ILoginRequestbody = req.body;
+
+      const user = await userService.validiateUser({ email, password });
+
+      if (user instanceof Error) {
+        return responseProvider.sendResponse({
+          message: user.message,
+          response: res,
+          statusCode: 400,
+        });
+      }
+
+      // create new token
+      const token = tokenHandler.generageToken({
+        userId: user._id,
+      });
+
+      return responseProvider.sendResponse({
+        message: "Login Successful",
+        response: res,
+        statusCode: 200,
+        data: {
+          access_token: token,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      return responseProvider.InternalServerError({
+        error: err as Error,
+        response: res,
       });
     }
   }
