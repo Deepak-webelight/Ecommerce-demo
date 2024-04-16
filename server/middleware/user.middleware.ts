@@ -3,7 +3,6 @@ import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import responseProvider from "../utils/responseProvider.utils";
 import tokenHandler from "../utils/tokenHandler.utils";
 import { UserService } from "../services/user.service";
-import { IuserDocument } from "../models/user.model";
 
 const userService = new UserService();
 
