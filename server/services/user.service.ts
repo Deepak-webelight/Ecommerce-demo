@@ -1,6 +1,20 @@
 import userModel, { IuserDocument } from "../models/user.model";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 
+interface IUserSearchQuery {
+  access_token?: string;
+  _id?: string;
+  email?: string;
+  name?: string;
+}
+interface IUserFilterQuery {
+  access_token?: string;
+  _id?: string;
+  email?: string;
+  name?: string;
+  password?: string;
+}
+
 export class UserService {
   async isUserExist(email: string): Promise<boolean> {
     try {
@@ -46,6 +60,22 @@ export class UserService {
       const validiateUser = await userModel.findOne({ email, password });
       if (validiateUser) return validiateUser;
       else return Error("Invalid email or password");
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
+  }
+  async updateUserData(
+    searchQuery: IUserSearchQuery,
+    filterQuery: IUserFilterQuery
+  ): Promise<IuserDocument | Error> {
+    try {
+      const response = await userModel.findOneAndUpdate(
+        searchQuery,
+        filterQuery
+      );
+
+      if (response) return response;
+      else return Error("user update failed");
     } catch (err) {
       throw new Error((err as Error).message);
     }

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import responseProvider from "../utils/responseProvider.utils";
+import tokenHandler from "../utils/tokenHandler.utils";
 
 export class UserMiddleware {
   async varifySignupRequestBody(
@@ -65,6 +66,54 @@ export class UserMiddleware {
         });
 
       next();
+    } catch (err) {
+      return responseProvider.InternalServerError({
+        response: res,
+        error: err as Error,
+      });
+    }
+  }
+  async varifyAuthToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // Extract user data from headers
+      const { authorization } = req.headers;
+
+      // validate authorization
+      if (!authorization) {
+        return responseProvider.sendResponse({
+          message: "Bad Request | Authorization header is missing",
+          response: res,
+          statusCode: 400,
+        });
+      }
+
+      // Extract token from authorization
+      const token = authorization.split(" ")[1];
+
+      // validate token
+      if (!token) {
+        return responseProvider.sendResponse({
+          message: "Bad Request | Invalid Token",
+          response: res,
+          statusCode: 400,
+        });
+      }
+      const isValidToken = await tokenHandler.verifyToken(token);
+
+      if (isValidToken) {
+        next();
+      } else {
+        return responseProvider.sendResponse({
+          message: "Bad Request | Token is invalid or expired",
+          response: res,
+          statusCode: 400,
+          tokenExpire: !!isValidToken,
+        });
+      }
     } catch (err) {
       return responseProvider.InternalServerError({
         response: res,

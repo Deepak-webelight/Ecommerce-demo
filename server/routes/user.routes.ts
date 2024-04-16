@@ -33,6 +33,9 @@ userRoutes.post(
 // user logout route
 userRoutes.get(
   "/logout",
+  usermiddlware.varifyAuthToken,
+  userController.userLogout
+
   // varifyAuthToken, UserLogoutController
 );
 

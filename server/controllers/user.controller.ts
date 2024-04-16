@@ -33,6 +33,9 @@ export class UserController {
         userId: newUser._id,
       });
 
+      // // update user data :todo
+      // await userService.updateUserData({ email }, { access_token: token });
+
       return responseProvider.sendResponse({
         message: "User Created Successfully",
         response: res,
@@ -67,6 +70,9 @@ export class UserController {
         userId: user._id,
       });
 
+      // // update user data :todo
+      // await userService.updateUserData({ email }, { access_token: token });
+
       return responseProvider.sendResponse({
         message: "Login Successful",
         response: res,
@@ -74,6 +80,28 @@ export class UserController {
         data: {
           access_token: token,
         },
+      });
+    } catch (err) {
+      console.log(err);
+      return responseProvider.InternalServerError({
+        error: err as Error,
+        response: res,
+      });
+    }
+  }
+  async userLogout(req: Request, res: Response): Promise<void> {
+    try {
+      const { authorization } = req.headers;
+
+      const token = (authorization as string)?.split(" ")[1];
+
+      // update user data :todo
+      //  await userService.updateUserData({ email }, { access_token: token });
+
+      return responseProvider.sendResponse({
+        message: "Logout Successful",
+        response: res,
+        statusCode: 200,
       });
     } catch (err) {
       console.log(err);
