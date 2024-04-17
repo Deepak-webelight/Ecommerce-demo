@@ -19,15 +19,6 @@ export class UserController {
         password,
       });
 
-      // if user service have some error
-      if (newUser instanceof Error) {
-        return responseProvider.sendResponse({
-          message: newUser.message,
-          response: res,
-          statusCode: 400,
-        });
-      }
-
       // Call user service to generate tokens
       const { token, refreshToken } = userService.generateTokens(newUser._id);
 

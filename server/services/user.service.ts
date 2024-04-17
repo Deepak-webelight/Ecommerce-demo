@@ -13,7 +13,7 @@ export class UserService {
     email,
     name,
     password,
-  }: IResisterRequestbody): Promise<IuserDocument | Error> {
+  }: IResisterRequestbody): Promise<IuserDocument> {
     try {
       // Check if user already exists
       const userExist = await userModel.exists({ email });
