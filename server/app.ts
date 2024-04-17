@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import connectDb from "./config/connectDB";
-import envProvider from "./utils/envProvider.utils";
+import appConfig from "./config/appConfig";
 import userRoutes from "./routes/user.routes";
 
 const app = express();
@@ -17,9 +17,9 @@ app.get("/", (req: Request, res: Response) => {
 
 connectDb()
   .then(() => {
-    app.listen(envProvider.port, () => {
+    app.listen(appConfig.port, () => {
       console.log(
-        "Server is fire at " + `http://localhost:${envProvider.port} 🚀`
+        "Server is fire at " + `http://localhost:${appConfig.port} 🚀`
       );
     });
   })

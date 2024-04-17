@@ -28,7 +28,6 @@ export class UserService {
     email,
     name,
     password,
-    access_token,
   }: IResisterRequestbody): Promise<IuserDocument | Error> {
     try {
       // Check if user already exists
@@ -37,14 +36,12 @@ export class UserService {
         return Error("User already exists");
       }
       // register as new user
-      const registeredUser = await new userModel({
+      const registeredUser = new userModel({
         email,
         name,
         password,
-        access_token,
       });
       const savedUser = registeredUser.save();
-
       return savedUser;
     } catch (err) {
       throw new Error((err as Error).message);

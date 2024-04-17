@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import envProvider from "../utils/envProvider.utils";
+import appConfig from "./appConfig";
 
 const connectDb = async () => {
-  if (!envProvider.mongodbUrl) throw new Error("MONGODB_URI is required");
+  if (!appConfig.mongodbUrl) throw new Error("MONGODB_URI is required");
   try {
-    const response = await mongoose.connect(envProvider.mongodbUrl);
+    const response = await mongoose.connect(appConfig.mongodbUrl);
     console.log("Connected to MongoDB ");
     return response;
   } catch (err) {

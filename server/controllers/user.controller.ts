@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import { UserService } from "../services/user.service";
 import responseProvider from "../utils/responseProvider.utils";
-import tokenHandler, { IgenerageTokenInput } from "../utils/tokenHandler.utils";
+import {
+  IgenerageTokenInput,
+  generageToken,
+  verifyToken,
+} from "../utils/tokenHandler.utils";
+import { tokenFormat } from "../utils/constants.utils";
 
 const userService = new UserService();
 
@@ -17,7 +22,6 @@ export class UserController {
         name,
         email,
         password,
-        access_token: null,
       });
 
       // if user service have some error
@@ -30,22 +34,36 @@ export class UserController {
       }
 
       // create new token
-      const token = tokenHandler.generageToken({
+      const token = generageToken({
         userId: newUser._id,
+        expiresIn: "2h",
       });
 
-      // update user data :todo
-      await userService.updateUserData({ email }, { access_token: token });
+      // create new token
+      const refreshToken = generageToken({
+        userId: newUser._id,
+        expiresIn: "3m",
+      });
 
       return responseProvider.sendResponse({
         message: "User Created Successfully",
         response: res,
         statusCode: 200,
-        data: {
-          access_token: token,
-        },
+        cookie: [
+          {
+            name: "refreshToken",
+            value: tokenFormat(refreshToken),
+            cookieOptions: { httpOnly: true, sameSite: "strict" },
+          },
+          {
+            name: "token",
+            value: tokenFormat(refreshToken),
+            cookieOptions: { httpOnly: true, sameSite: "strict" },
+          },
+        ],
       });
     } catch (err) {
+      console.log(err);
       return responseProvider.InternalServerError({
         response: res,
         error: err as Error,
@@ -67,20 +85,33 @@ export class UserController {
       }
 
       // create new token
-      const token = tokenHandler.generageToken({
+      const token = generageToken({
         userId: user._id,
+        expiresIn: "2h",
       });
 
-      // update user data :todo
-      await userService.updateUserData({ email }, { access_token: token });
+      // create new token
+      const refreshToken = generageToken({
+        userId: user._id,
+        expiresIn: "3m",
+      });
 
       return responseProvider.sendResponse({
         message: "Login Successful",
         response: res,
         statusCode: 200,
-        data: {
-          access_token: token,
-        },
+        cookie: [
+          {
+            name: "refreshToken",
+            value: tokenFormat(refreshToken),
+            cookieOptions: { httpOnly: true, sameSite: "strict" },
+          },
+          {
+            name: "token",
+            value: tokenFormat(refreshToken),
+            cookieOptions: { httpOnly: true, sameSite: "strict" },
+          },
+        ],
       });
     } catch (err) {
       console.log(err);
@@ -93,16 +124,11 @@ export class UserController {
   async userLogout(req: Request, res: Response): Promise<void> {
     try {
       const { authorization } = req.headers;
-
       const token = (authorization as string)?.split(" ")[1];
 
-      // update user data :todo
-     await userService.updateUserData(
-        { access_token: token },
-        { access_token: "" }
-      );
+      responseProvider.clearCookies({ name: "refreshToken", response: res });
+      responseProvider.clearCookies({ name: "token", response: res });
 
-     
       return responseProvider.sendResponse({
         message: "Logout Successful",
         response: res,
@@ -122,26 +148,24 @@ export class UserController {
 
       const token = (authorization as string)?.split(" ")[1];
 
-      const tokenData = (await tokenHandler.verifyToken(
-        token
-      )) as IgenerageTokenInput;
+      const tokenData = verifyToken(token) as IgenerageTokenInput;
 
-      const newToken = await tokenHandler.generageToken({
+      const newToken = generageToken({
         userId: tokenData.userId,
+        expiresIn: "2h",
       });
-
-      await userService.updateUserData(
-        { _id: tokenData.userId },
-        { access_token: newToken }
-      );
 
       return responseProvider.sendResponse({
         message: "token refreshed",
         response: res,
         statusCode: 200,
-        data: {
-          access_token: newToken,
-        },
+        cookie: [
+          {
+            name: "token",
+            value: tokenFormat(newToken),
+            cookieOptions: { httpOnly: true, sameSite: "strict" },
+          },
+        ],
       });
     } catch (err) {
       return responseProvider.InternalServerError({

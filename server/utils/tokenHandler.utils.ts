@@ -1,30 +1,29 @@
 import jwt from "jsonwebtoken";
-import envProvider from "./envProvider.utils";
+import appConfig from "../config/appConfig";
 
 export interface IgenerageTokenInput {
   userId: string;
+  expiresIn: "2h" | "3m";
 }
 
-interface ItokenHandler {
-  generageToken: (data: IgenerageTokenInput) => string;
-  verifyToken: (token: string) => jwt.JwtPayload | string;
-}
-
-const tokenHandler: ItokenHandler = {
-  generageToken: ({ userId }) => {
-    if (!envProvider.jwtSecret) throw Error("Invalid token secret");
-    const token = jwt.sign({ userId }, envProvider.jwtSecret, {
-      expiresIn: "24h",
-    });
-    return token;
-  },
-  verifyToken: async (token) => {
-    if (!envProvider.jwtSecret) throw Error("Invalid token secret");
-    try {
-      return await jwt.verify(token, envProvider.jwtSecret);
-    } catch (err) {
-      return false;
-    }
-  },
+export const generageToken = ({
+  userId,
+  expiresIn,
+}: IgenerageTokenInput): string => {
+  if (!appConfig.jwtSecret) throw Error("Invalid token secret");
+  const token = jwt.sign({ userId }, appConfig.jwtSecret, {
+    expiresIn,
+  });
+  return token;
 };
-export default tokenHandler;
+
+export const verifyToken = (
+  token: string
+): jwt.JwtPayload | string | boolean => {
+  if (!appConfig.jwtSecret) throw Error("Invalid token secret");
+  try {
+    return jwt.verify(token, appConfig.jwtSecret);
+  } catch (err) {
+    return false;
+  }
+};

@@ -11,7 +11,6 @@ export interface IResisterRequestbody {
   name: string;
   email: string;
   password: string;
-  access_token?: string | null 
 }
 
 userRoutes.post(

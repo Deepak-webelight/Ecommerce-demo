@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import responseProvider from "../utils/responseProvider.utils";
-import tokenHandler from "../utils/tokenHandler.utils";
 import { UserService } from "../services/user.service";
+import { emailRegex } from "../utils/constants.utils";
+import { verifyToken } from "../utils/tokenHandler.utils";
 
 const userService = new UserService();
 
@@ -24,7 +25,7 @@ export class UserMiddleware {
           statusCode: 400,
         });
 
-      if (!email)
+      if (!email || !emailRegex.test(email))
         return responseProvider.sendResponse({
           message: "Bad Request | Invalid email",
           response: res,
@@ -39,6 +40,7 @@ export class UserMiddleware {
 
       next();
     } catch (err) {
+      console.log(err);
       return responseProvider.InternalServerError({
         response: res,
         error: err as Error,
@@ -55,7 +57,7 @@ export class UserMiddleware {
       const { email, password }: ILoginRequestbody = req.body;
 
       // validate email and password
-      if (!email)
+      if (!email || !emailRegex.test(email))
         return responseProvider.sendResponse({
           message: "Bad Request | Invalid email",
           response: res,
@@ -67,7 +69,6 @@ export class UserMiddleware {
           response: res,
           statusCode: 400,
         });
-
       next();
     } catch (err) {
       return responseProvider.InternalServerError({
@@ -105,17 +106,9 @@ export class UserMiddleware {
           statusCode: 400,
         });
       }
-      const isValidToken = await tokenHandler.verifyToken(token);
+      const isValidToken = verifyToken(token);
 
-      // validate active user with token
-
-      const validateActiveUser = await userService.findUserData({
-        access_token: token,
-      });
-
-      console.log("validateActiveUser instanceof Error", validateActiveUser)
-
-      if (isValidToken && !(validateActiveUser instanceof Error)) {
+      if (isValidToken) {
         next();
       } else {
         return responseProvider.sendResponse({
