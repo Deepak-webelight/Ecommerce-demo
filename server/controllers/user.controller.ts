@@ -1,12 +1,7 @@
 import { Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
-import { UserService } from "../services/user.service";
+import { IgenerateToken, UserService } from "../services/user.service";
 import responseProvider from "../utils/responseProvider.utils";
-import {
-  IgenerageTokenInput,
-  generageToken,
-  verifyToken,
-} from "../utils/tokenHandler.utils";
 import { tokenFormat } from "../utils/constants.utils";
 
 const userService = new UserService();
@@ -33,17 +28,8 @@ export class UserController {
         });
       }
 
-      // create new token
-      const token = generageToken({
-        userId: newUser._id,
-        expiresIn: "2h",
-      });
-
-      // create new token
-      const refreshToken = generageToken({
-        userId: newUser._id,
-        expiresIn: "3m",
-      });
+      // Call user service to generate tokens
+      const { token, refreshToken } = userService.generateTokens(newUser._id);
 
       return responseProvider.sendResponse({
         message: "User Created Successfully",
@@ -51,22 +37,18 @@ export class UserController {
         statusCode: 200,
         cookie: [
           {
-            name: "refreshToken",
-            value: tokenFormat(refreshToken),
-            cookieOptions: { httpOnly: true, sameSite: "strict" },
-          },
-          {
             name: "token",
-            value: tokenFormat(refreshToken),
-            cookieOptions: { httpOnly: true, sameSite: "strict" },
+            value: tokenFormat(token),
           },
+          { name: "refreshToken", value: tokenFormat(refreshToken) },
         ],
       });
     } catch (err) {
-      console.log(err);
+      // send error response if resister failed
       return responseProvider.InternalServerError({
         response: res,
         error: err as Error,
+        message: (err as Error).message,
       });
     }
   }
@@ -74,27 +56,11 @@ export class UserController {
     try {
       const { email, password }: ILoginRequestbody = req.body;
 
+      // call user service to validate user credentials
       const user = await userService.validiateUser({ email, password });
 
-      if (user instanceof Error) {
-        return responseProvider.sendResponse({
-          message: user.message,
-          response: res,
-          statusCode: 400,
-        });
-      }
-
-      // create new token
-      const token = generageToken({
-        userId: user._id,
-        expiresIn: "2h",
-      });
-
-      // create new token
-      const refreshToken = generageToken({
-        userId: user._id,
-        expiresIn: "3m",
-      });
+      // Call user service to generate tokens
+      const { token, refreshToken } = userService.generateTokens(user._id);
 
       return responseProvider.sendResponse({
         message: "Login Successful",
@@ -102,67 +68,63 @@ export class UserController {
         statusCode: 200,
         cookie: [
           {
-            name: "refreshToken",
-            value: tokenFormat(refreshToken),
-            cookieOptions: { httpOnly: true, sameSite: "strict" },
-          },
-          {
             name: "token",
-            value: tokenFormat(refreshToken),
-            cookieOptions: { httpOnly: true, sameSite: "strict" },
+            value: tokenFormat(token),
           },
+          { name: "refreshToken", value: tokenFormat(refreshToken) },
         ],
       });
     } catch (err) {
-      console.log(err);
+      // send error response if login failed
       return responseProvider.InternalServerError({
+        response: res,
         error: err as Error,
-        response: res,
-      });
-    }
-  }
-  async userLogout(req: Request, res: Response): Promise<void> {
-    try {
-      responseProvider.clearCookies({ name: "refreshToken", response: res });
-      responseProvider.clearCookies({ name: "token", response: res });
-
-      return responseProvider.sendResponse({
-        message: "Logout Successful",
-        response: res,
-        statusCode: 200,
-      });
-    } catch (err) {
-      console.log(err);
-      return responseProvider.InternalServerError({
-        error: err as Error,
-        response: res,
+        message: (err as Error).message,
       });
     }
   }
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
-      const { authorization } = req.headers;
+      const authorization = req.headers.authorization as string;
+      const token = authorization?.split(" ")[1];
 
-      const token = (authorization as string)?.split(" ")[1];
+      // call user service to extract data from token
+      const { userId } = userService.verifyToken(token) as IgenerateToken;
 
-      const tokenData = verifyToken(token) as IgenerageTokenInput;
-
-      const newToken = generageToken({
-        userId: tokenData.userId,
-        expiresIn: "2h",
-      });
+      // call user service to retrieve new token
+      const newToken = userService.createNewToken(userId, "1d");
 
       return responseProvider.sendResponse({
         message: "token refreshed",
         response: res,
         statusCode: 200,
-        cookie: [
-          {
-            name: "token",
-            value: tokenFormat(newToken),
-            cookieOptions: { httpOnly: true, sameSite: "strict" },
-          },
-        ],
+        data: {
+          token: newToken,
+        },
+      });
+    } catch (err) {
+      return responseProvider.InternalServerError({
+        error: err as Error,
+        response: res,
+      });
+    }
+  }
+  async userLogout(req: Request, res: Response) {
+    try {
+      
+      //  clear cookies 
+      responseProvider.clearCookies({
+        name: "token",
+        response: res,
+      });
+      responseProvider.clearCookies({
+        name: "refreshToken",
+        response: res,
+      });
+      return responseProvider.sendResponse({
+        message: "logout successfully",
+        response: res,
+        statusCode: 200,
       });
     } catch (err) {
       return responseProvider.InternalServerError({

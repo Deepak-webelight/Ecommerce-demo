@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 // call bellow server routes 
-app.use("/auth", userRoutes);
+app.use("/user", userRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello from gateway!");

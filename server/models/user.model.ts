@@ -18,6 +18,7 @@ const userModelSchema = new Schema<IuserDocument>(
       type: String,
       required: true,
       unique: true,
+      match: [/.+@.+\..+/, "Please enter a valid email"],
     },
     password: {
       type: String,

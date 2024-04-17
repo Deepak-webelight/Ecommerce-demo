@@ -1,11 +1,8 @@
 import { Response } from "express";
 
 // user route Response data
-interface LoginsignupDataResponse {
-  access_token: string;
-}
 
-type ServerResponseData = LoginsignupDataResponse | any; // todo
+type ServerResponseData = any; // todo
 
 interface ICookieOptions {
   domain?: string;
@@ -29,7 +26,7 @@ interface IsendResponse {
   cookie?: {
     name: string;
     value: string;
-    cookieOptions: ICookieOptions;
+    cookieOptions?: ICookieOptions;
   }[];
 }
 
@@ -37,6 +34,7 @@ interface IInternalServerError {
   response: Response;
   message?: string;
   error: Error;
+  statusCode?: number;
 }
 interface IClearCookie {
   name: string;
@@ -65,11 +63,10 @@ const responseProvider: IresponseProvider = {
 
     if (cookie?.length) {
       cookie.forEach((reqCookie) =>
-        response.cookie(
-          reqCookie.name,
-          reqCookie.value,
-          reqCookie.cookieOptions
-        )
+        response.cookie(reqCookie.name, reqCookie.value, {
+          httpOnly: true,
+          sameSite: "strict",
+        })
       );
     }
 
@@ -80,14 +77,14 @@ const responseProvider: IresponseProvider = {
       tokenExpire,
     });
   },
-  InternalServerError: ({ response, message, error }) => {
+  InternalServerError: ({ response, message, error, statusCode }) => {
     console.log("Internal Server Error", error);
     response
       .status(500)
       .set("Content-Type", "application/json")
       .send({
         message: message || "Internal Server Error",
-        statusCode: 500,
+        statusCode: statusCode || 500,
       });
   },
   clearCookies: ({ name, response }) => {

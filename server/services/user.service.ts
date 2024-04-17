@@ -1,29 +1,14 @@
+import appConfig from "../config/appConfig";
 import userModel, { IuserDocument } from "../models/user.model";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-interface IUserSearchQuery {
-  access_token?: string;
-  _id?: string;
-  email?: string;
-  name?: string;
-}
-interface IUserFilterQuery {
-  access_token?: string;
-  _id?: string;
-  email?: string;
-  name?: string;
-  password?: string;
+export interface IgenerateToken {
+  userId: string;
 }
 
 export class UserService {
-  async isUserExist(email: string): Promise<boolean> {
-    try {
-      const userExists = await userModel.exists({ email });
-      return !!userExists;
-    } catch (err) {
-      return false;
-    }
-  }
   async resisterNewUser({
     email,
     name,
@@ -31,18 +16,22 @@ export class UserService {
   }: IResisterRequestbody): Promise<IuserDocument | Error> {
     try {
       // Check if user already exists
-      const userExist = await this.isUserExist(email);
+      const userExist = await userModel.exists({ email });
       if (userExist) {
-        return Error("User already exists");
+        throw new Error("User already exists");
       }
+
+      // encrypt the password
+      const hashPassword = await this.hashPassword(password);
+
       // register as new user
       const registeredUser = new userModel({
         email,
         name,
-        password,
+        password: hashPassword,
       });
-      const savedUser = registeredUser.save();
-      return savedUser;
+
+      return registeredUser.save();
     } catch (err) {
       throw new Error((err as Error).message);
     }
@@ -50,49 +39,64 @@ export class UserService {
   async validiateUser({
     email,
     password,
-  }: ILoginRequestbody): Promise<IuserDocument | Error> {
+  }: ILoginRequestbody): Promise<IuserDocument> {
     try {
-      // if user not existing
-      const isUserExist = await this.isUserExist(email);
-      if (!isUserExist) {
-        return Error("User does not exist");
+      // check user data
+      const user = await userModel.findOne({ email });
+
+      if (!user) {
+        throw new Error("User does not exist");
       }
 
-      // validate email password
+      // validate user password
+      const validate = await this.verifyPassword(password, user.password);
 
-      const validiateUser = await userModel.findOne({ email, password });
-      if (validiateUser) return validiateUser;
-      else return Error("Invalid email or password");
+      if (!validate) {
+        throw new Error("Invalid password");
+      }
+
+      return user;
     } catch (err) {
       throw new Error((err as Error).message);
     }
   }
-  async updateUserData(
-    searchQuery: IUserSearchQuery,
-    filterQuery: IUserFilterQuery
-  ): Promise<IuserDocument | Error> {
-    try {
-      const response = await userModel.findOneAndUpdate(
-        searchQuery,
-        filterQuery
-      );
-      console.log("response", response, searchQuery, filterQuery);
+  generateTokens(userId: string): { token: string; refreshToken: string } {
+    const token = this.createNewToken(userId, "1d");
+    const refreshToken = this.createNewToken(userId, "3m");
 
-      if (response) return response;
-      else return Error("user update failed");
+    return { token, refreshToken };
+  }
+  createNewToken(userId: string, expiresIn: "1d" | "3m"): string {
+    if (!appConfig.jwtSecret) {
+      throw Error("Invalid token secret");
+    }
+    return jwt.sign({ userId }, appConfig.jwtSecret, {
+      expiresIn,
+    });
+  }
+  verifyToken(token: string): jwt.JwtPayload | string | boolean {
+    if (!appConfig.jwtSecret) throw Error("Invalid token secret");
+    try {
+      return jwt.verify(token, appConfig.jwtSecret);
     } catch (err) {
-      throw new Error((err as Error).message);
+      return false;
     }
   }
-  async findUserData(
-    searchQuery: IUserSearchQuery
-  ): Promise<IuserDocument | Error> {
+  async hashPassword(password: string): Promise<string> {
     try {
-      const response = await userModel.findOne(searchQuery);
-      if (response) return response;
-      else return Error("user not found");
-    } catch (err) {
-      return Error((err as Error).message);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      return hashedPassword;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async verifyPassword(plainPassword: string, hashedPassword: string) {
+    try {
+      const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+      return isMatch;
+    } catch (error) {
+      throw error;
     }
   }
 }

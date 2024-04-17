@@ -31,14 +31,14 @@ userRoutes.post(
 );
 
 // user logout route
-userRoutes.get(
+userRoutes.post(
   "/logout",
   usermiddlware.varifyAuthToken,
   userController.userLogout
 );
 
 // refresh token route
-userRoutes.get(
+userRoutes.post(
   "/refresh",
   usermiddlware.varifyAuthToken,
   userController.refreshToken
