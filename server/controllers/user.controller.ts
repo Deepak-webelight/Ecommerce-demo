@@ -123,9 +123,6 @@ export class UserController {
   }
   async userLogout(req: Request, res: Response): Promise<void> {
     try {
-      const { authorization } = req.headers;
-      const token = (authorization as string)?.split(" ")[1];
-
       responseProvider.clearCookies({ name: "refreshToken", response: res });
       responseProvider.clearCookies({ name: "token", response: res });
 
