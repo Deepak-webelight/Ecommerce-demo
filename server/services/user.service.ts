@@ -1,12 +1,7 @@
-import appConfig from "../config/appConfig";
 import userModel, { IuserDocument } from "../models/user.model";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-
-export interface IgenerateToken {
-  userId: string;
-}
+import { createHashPassword, verifyPassword } from "../utils/bcrypt";
+import { IgenerateToken, createNewToken, verifyToken } from "../utils/jwt";
 
 export class UserService {
   async resisterNewUser({
@@ -22,7 +17,7 @@ export class UserService {
       }
 
       // encrypt the password
-      const hashPassword = await this.hashPassword(password);
+      const hashPassword = await createHashPassword(password);
 
       // register as new user
       const registeredUser = new userModel({
@@ -49,7 +44,7 @@ export class UserService {
       }
 
       // validate user password
-      const validate = await this.verifyPassword(password, user.password);
+      const validate = await verifyPassword(password, user.password);
 
       if (!validate) {
         throw new Error("Invalid password");
@@ -60,43 +55,19 @@ export class UserService {
       throw new Error((err as Error).message);
     }
   }
+  async refreshToken(token: string): Promise<string> {
+    try {
+      const { userId } = verifyToken(token) as IgenerateToken;
+
+      return createNewToken(userId, "1d");
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
+  }
   generateTokens(userId: string): { token: string; refreshToken: string } {
-    const token = this.createNewToken(userId, "1d");
-    const refreshToken = this.createNewToken(userId, "3m");
+    const token = createNewToken(userId, "1d");
+    const refreshToken = createNewToken(userId, "3m");
 
     return { token, refreshToken };
-  }
-  createNewToken(userId: string, expiresIn: "1d" | "3m"): string {
-    if (!appConfig.jwtSecret) {
-      throw Error("Invalid token secret");
-    }
-    return jwt.sign({ userId }, appConfig.jwtSecret, {
-      expiresIn,
-    });
-  }
-  verifyToken(token: string): jwt.JwtPayload | string | boolean {
-    if (!appConfig.jwtSecret) throw Error("Invalid token secret");
-    try {
-      return jwt.verify(token, appConfig.jwtSecret);
-    } catch (err) {
-      return false;
-    }
-  }
-  async hashPassword(password: string): Promise<string> {
-    try {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      return hashedPassword;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async verifyPassword(plainPassword: string, hashedPassword: string) {
-    try {
-      const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
-      return isMatch;
-    } catch (error) {
-      throw error;
-    }
   }
 }

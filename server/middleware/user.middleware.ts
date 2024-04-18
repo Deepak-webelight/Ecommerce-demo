@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import responseProvider from "../utils/responseProvider.utils";
-import { UserService } from "../services/user.service";
 import { emailRegex } from "../utils/constants.utils";
-
-const userService = new UserService();
+import { verifyToken } from "../utils/jwt";
 
 export class UserMiddleware {
   varifySignupRequestBody(
@@ -67,42 +65,41 @@ export class UserMiddleware {
     next();
   }
   varifyAuthToken(req: Request, res: Response, next: NextFunction): void {
-    // Extract data from headers
-    const { authorization } = req.headers;
+    try {
+      // Extract data from headers
+      const { authorization } = req.headers;
 
-    // does authorization exist in headers
-    if (!authorization) {
-      return responseProvider.sendResponse({
-        message: "Bad Request | Authorization header is missing",
-        response: res,
-        statusCode: 400,
-      });
-    }
+      // does authorization exist in headers
+      if (!authorization) {
+        return responseProvider.sendResponse({
+          message: "Bad Request | Authorization header is missing",
+          response: res,
+          statusCode: 400,
+        });
+      }
 
-    // Extract token from authorization
-    const token = authorization.split(" ")[1];
+      // Extract token from authorization
+      const token = authorization.split(" ")[1];
 
-    // Is token exist in authorization
-    if (!token) {
-      return responseProvider.sendResponse({
-        message: "Bad Request | Invalid Token",
-        response: res,
-        statusCode: 400,
-      });
-    }
+      // Is token exist in authorization
+      if (!token) {
+        return responseProvider.sendResponse({
+          message: "Token does not exist",
+          response: res,
+          statusCode: 400,
+        });
+      }
 
-    // call user service to varify token
-    const isValidToken = userService.verifyToken(token);
-
-    
-    if (isValidToken) {
+      // varify token
+      verifyToken(token);
       next();
-    } else {
+
+    } catch (err) {
       return responseProvider.sendResponse({
-        message: "Bad Request | Token is invalid or expired",
+        message: "Token is invalid or expired",
         response: res,
         statusCode: 400,
-        tokenExpire: !isValidToken,
+        tokenExpire: false,
       });
     }
   }

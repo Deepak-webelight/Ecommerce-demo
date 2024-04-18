@@ -1,13 +1,12 @@
 import { Response } from "express";
 
 // user route Response data
-
-type ServerResponseData = any; // todo
+type ServerResponseData = Object; // todo 
 
 interface ICookieOptions {
   domain?: string;
   path?: string;
-  expires?: Date | undefined;
+  expires?: Date;
   maxAge?: number;
   secure?: boolean;
   httpOnly?: boolean;
@@ -78,7 +77,7 @@ const responseProvider: IresponseProvider = {
     });
   },
   InternalServerError: ({ response, message, error, statusCode }) => {
-    console.log("Internal Server Error", error);
+    console.log("Internal Server Error", error.message);
     response
       .status(500)
       .set("Content-Type", "application/json")
