@@ -17,7 +17,7 @@ export class UserController {
     const { _id } = await this.userService.registerNewUser(body);
 
     // call UserService to generate new tokens
-    const { token, refreshToken } = await this.userService.generateTokens(_id);
+    const { token, refreshToken } = this.userService.generateTokens(_id);
 
     return {
       data: { token, refreshToken },

@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './user/user.module';
-import configuration from './appConfig/configuration';
+import configuration, { Iconfiguration } from './appConfig/configuration';
 import configValidation from './appConfig/configuration.validate';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -13,6 +14,13 @@ import configValidation from './appConfig/configuration.validate';
       validationSchema: configValidation,
       load: [configuration],
       isGlobal: true,
+    }),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      global: true,
+      useFactory: (config: ConfigService<Iconfiguration>) => ({
+        secret: config.get<string>('jwtSecret'),
+      }),
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
     userModule,

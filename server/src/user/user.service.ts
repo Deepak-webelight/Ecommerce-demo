@@ -1,16 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import mongoose, { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Iconfiguration } from 'src/appConfig/configuration';
 import { SignUpRequestBodyDto } from './user.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
-import mongoose, { Model } from 'mongoose';
 import { createHashPassword } from 'src/utils/bycrpt';
+
 @Injectable()
 export class UserService {
   constructor(
     private configService: ConfigService<Iconfiguration>,
     @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService,
   ) {}
 
   async registerNewUser(body: SignUpRequestBodyDto) {
@@ -45,7 +48,24 @@ export class UserService {
       return false;
     }
   }
-  async generateTokens(userId: mongoose.Types.ObjectId) {
-    return { token: '', refreshToken: '' };
+  generateTokens(userId: mongoose.Types.ObjectId) {
+    console.log(
+      "this.configService.get<string | number>('tokenExpiry')",
+      typeof this.configService.get('tokenExpiry'),
+    );
+
+    // generate new token and refresh token
+    const token = this.jwtService.sign(
+      { userId: userId },
+      { expiresIn: this.configService.get('tokenExpiry') },
+    );
+    const refreshToken = this.jwtService.sign(
+      { userId: userId },
+      {
+        expiresIn: this.configService.get('refreshTokenExpiry'),
+      },
+    );
+
+    return { token, refreshToken };
   }
 }
