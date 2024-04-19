@@ -1,4 +1,4 @@
-import { sign, JwtPayload, verify } from "jsonwebtoken";
+import { sign, JwtPayload, verify, decode } from "jsonwebtoken";
 import appConfig from "../config/appConfig";
 
 export interface IgenerateToken {
@@ -16,10 +16,19 @@ export const createNewToken = (
   });
 };
 
-export const verifyToken = (token: string): JwtPayload | string => {
+export const verifyToken = (token: string): IgenerateToken => {
   if (!appConfig.jwtSecret) throw Error("Invalid token secret");
   try {
-    return verify(token, appConfig.jwtSecret);
+    return verify(token, appConfig.jwtSecret) as IgenerateToken;
+  } catch (err) {
+    throw new Error((err as Error).message);
+  }
+};
+
+export const decodeToken = (token: string): IgenerateToken => {
+  if (!appConfig.jwtSecret) throw Error("Invalid token secret");
+  try {
+    return decode(token) as IgenerateToken;
   } catch (err) {
     throw new Error((err as Error).message);
   }

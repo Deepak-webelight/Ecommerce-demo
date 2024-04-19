@@ -1,7 +1,12 @@
 import userModel, { IuserDocument } from "../models/user.model";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
 import { createHashPassword, verifyPassword } from "../utils/bcrypt";
-import { IgenerateToken, createNewToken, verifyToken } from "../utils/jwt";
+import {
+  IgenerateToken,
+  createNewToken,
+  decodeToken,
+  verifyToken,
+} from "../utils/jwt";
 
 export class UserService {
   async resisterNewUser({
@@ -57,7 +62,7 @@ export class UserService {
   }
   async refreshToken(token: string): Promise<string> {
     try {
-      const { userId } = verifyToken(token) as IgenerateToken;
+      const { userId } = decodeToken(token);
 
       return createNewToken(userId, "1d");
     } catch (err) {
