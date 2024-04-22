@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Post, Res, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  Req,
+  BadRequestException,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
@@ -34,7 +42,7 @@ export class UserController {
         status: HttpStatus.CREATED,
       };
     } catch (error) {
-      return error.response;
+      throw new BadRequestException(error.response);
     }
   }
 
@@ -64,7 +72,7 @@ export class UserController {
         status: HttpStatus.OK,
       };
     } catch (error) {
-      return error.response;
+      throw new BadRequestException(error.response);
     }
   }
 
@@ -79,7 +87,7 @@ export class UserController {
         status: HttpStatus.OK,
       };
     } catch (error) {
-      return error.response;
+      throw new BadRequestException(error.response);
     }
   }
 
@@ -101,7 +109,7 @@ export class UserController {
         status: HttpStatus.OK,
       };
     } catch (error) {
-      return error.response;
+      throw new BadRequestException(error.response);
     }
   }
 }

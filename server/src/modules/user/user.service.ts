@@ -4,10 +4,10 @@ import mongoose, { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Iconfiguration } from 'src/appConfig/configuration';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
+import { Iconfiguration } from './user.interface';
 
 @Injectable()
 export class UserService {
@@ -42,7 +42,6 @@ export class UserService {
   }
   async isExist(email: string) {
     const user = await this.userModel.findOne({ email });
-
     if (user) {
       return true;
     } else {

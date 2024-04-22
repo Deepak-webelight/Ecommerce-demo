@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './modules/user/user.module';
-import configuration, { Iconfiguration } from './appConfig/configuration';
+import configuration from './appConfig/configuration';
 import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';
+import { Iconfiguration } from './modules/user/user.interface';
 
 @Module({
   imports: [
