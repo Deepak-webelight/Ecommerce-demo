@@ -17,6 +17,7 @@ export class SignUpRequestBodyDto {
   @IsStrongPassword()
   readonly password: string;
 }
+
 export class LoginRequestDto {
   @IsEmail()
   readonly email: string;

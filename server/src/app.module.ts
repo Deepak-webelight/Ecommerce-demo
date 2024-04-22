@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { userModule } from './user/user.module';
+import { userModule } from './modules/user/user.module';
 import configuration, { Iconfiguration } from './appConfig/configuration';
 import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';

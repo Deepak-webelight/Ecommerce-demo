@@ -1,13 +1,13 @@
+import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import mongoose, { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Iconfiguration } from 'src/appConfig/configuration';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
-import { User } from './user.schema';
+import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
-import { Request } from 'express';
 
 @Injectable()
 export class UserService {
