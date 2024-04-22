@@ -8,6 +8,7 @@ import configuration from './appConfig/configuration';
 import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';
 import { Iconfiguration } from './modules/user/user.interface';
+import { productModule } from './modules/products/products.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { Iconfiguration } from './modules/user/user.interface';
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
     userModule,
+    productModule
   ],
   controllers: [AppController],
   providers: [AppService],
