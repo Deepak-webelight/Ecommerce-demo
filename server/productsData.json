@@ -1,0 +1,517 @@
+[
+  {
+    "name": "iPhone 13 Pro",
+    "description": "The latest flagship smartphone from Apple with advanced camera capabilities and powerful performance.",
+    "price": 74100
+  },
+  {
+    "name": "iPhone 12",
+    "description": "A popular smartphone by Apple known for its sleek design and powerful performance.",
+    "price": 59222
+  },
+  {
+    "name": "iPhone SE (2020)",
+    "description": "A budget-friendly smartphone by Apple with the powerful A13 Bionic chip.",
+    "price": 29667
+  },
+  {
+    "name": "iPhone 11 Pro Max",
+    "description": "An older flagship smartphone by Apple known for its large display and impressive camera system.",
+    "price": 81867
+  },
+  {
+    "name": "iPhone XR",
+    "description": "A mid-range smartphone by Apple with a Liquid Retina display.",
+    "price": 44489
+  },
+  {
+    "name": "Samsung Galaxy S21 Ultra",
+    "description": "A flagship smartphone by Samsung featuring a powerful camera setup and stunning display.",
+    "price": 85999
+  },
+  {
+    "name": "Samsung Galaxy Note 20 Ultra",
+    "description": "A high-end smartphone with a large display and S Pen support for enhanced productivity.",
+    "price": 94999
+  },
+  {
+    "name": "Samsung Galaxy A52",
+    "description": "A mid-range smartphone with a sleek design and versatile camera setup.",
+    "price": 26999
+  },
+  {
+    "name": "Samsung Galaxy M42 5G",
+    "description": "An affordable 5G smartphone by Samsung with long battery life.",
+    "price": 21999
+  },
+  {
+    "name": "Samsung Galaxy F41",
+    "description": "A budget-friendly smartphone with a Super AMOLED display for vibrant colors.",
+    "price": 15499
+  },
+  {
+    "name": "Xiaomi Mi 11 Ultra",
+    "description": "A flagship smartphone by Xiaomi with a powerful camera setup and high-resolution display.",
+    "price": 69999
+  },
+  {
+    "name": "Xiaomi Redmi Note 11 Pro",
+    "description": "A mid-range smartphone with a large display and fast charging support.",
+    "price": 24999
+  },
+  {
+    "name": "Xiaomi Poco X4 Pro",
+    "description": "An affordable smartphone with a high-refresh-rate display and long-lasting battery.",
+    "price": 18999
+  },
+  {
+    "name": "Xiaomi Redmi 10",
+    "description": "An entry-level smartphone with decent performance and a large display.",
+    "price": 12999
+  },
+  {
+    "name": "Xiaomi Black Shark 4",
+    "description": "A gaming smartphone with a high-refresh-rate display and dedicated gaming features.",
+    "price": 28999
+  },
+  {
+    "name": "Huawei P50 Pro",
+    "description": "A premium smartphone with a powerful camera system and elegant design.",
+    "price": 79999
+  },
+  {
+    "name": "Huawei Mate X3",
+    "description": "A foldable smartphone with a large flexible display and powerful performance.",
+    "price": 109999
+  },
+  {
+    "name": "Huawei Nova 9",
+    "description": "A stylish smartphone with a high-resolution display and impressive camera capabilities.",
+    "price": 54999
+  },
+  {
+    "name": "Huawei Enjoy 20 Plus",
+    "description": "An affordable smartphone with a large display and decent performance.",
+    "price": 24999
+  },
+  {
+    "name": "Huawei Y9a",
+    "description": "A mid-range smartphone with a large battery and versatile camera setup.",
+    "price": 19999
+  },
+  {
+    "name": "OnePlus 9 Pro",
+    "description": "A flagship smartphone with top-of-the-line specifications and stunning design.",
+    "price": 64999
+  },
+  {
+    "name": "OnePlus 8T",
+    "description": "A powerful smartphone with a high-refresh-rate display and fast charging.",
+    "price": 54999
+  },
+  {
+    "name": "OnePlus Nord 2",
+    "description": "A mid-range smartphone with a focus on camera performance and software experience.",
+    "price": 29999
+  },
+  {
+    "name": "OnePlus 8",
+    "description": "A premium smartphone with a sleek design and impressive display.",
+    "price": 44999
+  },
+  {
+    "name": "OnePlus Nord CE 5G",
+    "description": "An affordable 5G smartphone with decent performance and clean software.",
+    "price": 24999
+  },
+  {
+    "name": "HP Spectre x360",
+    "description": "A versatile 2-in-1 laptop with a stunning design and excellent performance.",
+    "price": 89999
+  },
+  {
+    "name": "HP Pavilion 15",
+    "description": "A budget-friendly laptop with decent performance and a sleek design.",
+    "price": 49999
+  },
+  {
+    "name": "HP Envy 13",
+    "description": "A sleek and lightweight laptop with powerful performance and long battery life.",
+    "price": 74999
+  },
+  {
+    "name": "HP Omen 15",
+    "description": "A gaming laptop with powerful hardware and stunning display for immersive gaming experience.",
+    "price": 109999
+  },
+  {
+    "name": "HP EliteBook 840 G7",
+    "description": "A premium business laptop with top-notch security features and reliable performance.",
+    "price": 79999
+  },
+  {
+    "name": "Dell XPS 13",
+    "description": "A premium ultrabook with a stunning display and exceptional performance.",
+    "price": 89999
+  },
+  {
+    "name": "Dell Inspiron 15",
+    "description": "A versatile laptop with decent performance and a spacious display.",
+    "price": 54999
+  },
+  {
+    "name": "Dell Latitude 7410",
+    "description": "A sleek and durable business laptop with powerful performance and security features.",
+    "price": 79999
+  },
+  {
+    "name": "Dell G5 15 SE",
+    "description": "A gaming laptop with powerful hardware and immersive display for gaming enthusiasts.",
+    "price": 94999
+  },
+  {
+    "name": "Dell Precision 5550",
+    "description": "A high-performance mobile workstation with exceptional processing power and reliability.",
+    "price": 119999
+  },
+  {
+    "name": "Lenovo ThinkPad X1 Carbon",
+    "description": "A premium ultrabook designed for business professionals with excellent performance and durability.",
+    "price": 84999
+  },
+  {
+    "name": "Lenovo Yoga C940",
+    "description": "A versatile 2-in-1 laptop with a stunning display and powerful performance for productivity and entertainment.",
+    "price": 74999
+  },
+  {
+    "name": "Lenovo Legion 5",
+    "description": "A gaming laptop with powerful hardware and advanced cooling system for immersive gaming experiences.",
+    "price": 79999
+  },
+  {
+    "name": "Lenovo IdeaPad Slim 5i",
+    "description": "A slim and lightweight laptop with reliable performance for everyday computing tasks.",
+    "price": 54999
+  },
+  {
+    "name": "Lenovo Flex 5",
+    "description": "A convertible laptop with versatile functionality and solid performance for multitasking and creativity.",
+    "price": 64999
+  },
+  {
+    "name": "MacBook Air (M1, 2020)",
+    "description": "An ultra-thin and lightweight laptop with Apple's M1 chip for exceptional performance and battery life.",
+    "price": 89990
+  },
+  {
+    "name": "MacBook Pro 13-inch (M1, 2020)",
+    "description": "A professional-grade laptop with Apple's M1 chip and stunning Retina display for enhanced productivity and creativity.",
+    "price": 109900
+  },
+  {
+    "name": "MacBook Pro 16-inch (2021)",
+    "description": "A powerful and versatile laptop with a larger Retina display and advanced performance features for professional users.",
+    "price": 199900
+  },
+  {
+    "name": "iPad Pro 12.9-inch (5th generation, 2021)",
+    "description": "A powerful tablet with stunning Liquid Retina XDR display and performance for creative professionals.",
+    "price": 109900
+  },
+  {
+    "name": "iPhone 13 Pro Max",
+    "description": "The latest flagship smartphone with advanced camera system, performance, and battery life.",
+    "price": 129900
+  },
+  {
+    "name": "Asus ROG Zephyrus G14",
+    "description": "A high-performance gaming laptop with AMD Ryzen 9 processor and NVIDIA GeForce RTX 3060 GPU.",
+    "price": 99990
+  },
+  {
+    "name": "Asus ZenBook 14",
+    "description": "An ultraportable laptop with a sleek design, AMD Ryzen 7 processor, and OLED display.",
+    "price": 84990
+  },
+  {
+    "name": "Asus TUF Gaming A15",
+    "description": "A budget-friendly gaming laptop with AMD Ryzen 5 processor and NVIDIA GeForce GTX 1650 GPU.",
+    "price": 64990
+  },
+  {
+    "name": "Asus VivoBook S14",
+    "description": "A stylish and lightweight laptop with Intel Core i5 processor and fast SSD storage.",
+    "price": 54990
+  },
+  {
+    "name": "Asus Chromebook Flip C434",
+    "description": "A 2-in-1 Chromebook with a sleek design, 14-inch touchscreen, and Intel Core M3 processor.",
+    "price": 44990
+  },
+  {
+    "name": "iPad Pro (2021)",
+    "description": "The latest iPad Pro featuring the powerful M1 chip, Liquid Retina XDR display, and 5G connectivity.",
+    "price": 89900
+  },
+  {
+    "name": "iPad Air (2020)",
+    "description": "The stylish iPad Air with A14 Bionic chip, Liquid Retina display, and support for Apple Pencil (2nd generation).",
+    "price": 54900
+  },
+  {
+    "name": "iPad Mini (2021)",
+    "description": "The compact iPad Mini with A15 Bionic chip, 8.3-inch Liquid Retina display, and USB-C connectivity.",
+    "price": 46900
+  },
+  {
+    "name": "iPad (9th generation)",
+    "description": "The entry-level iPad with A13 Bionic chip, 10.2-inch Retina display, and support for Apple Pencil (1st generation).",
+    "price": 32900
+  },
+  {
+    "name": "iPad Pro 12.9-inch (2020)",
+    "description": "The previous-generation iPad Pro with A12Z Bionic chip, edge-to-edge Liquid Retina display, and LiDAR scanner.",
+    "price": 79900
+  },
+  {
+    "name": "Samsung Galaxy Tab S7+",
+    "description": "The premium Android tablet with a stunning Super AMOLED display, S Pen support, and powerful Snapdragon processor.",
+    "price": 69999
+  },
+  {
+    "name": "Samsung Galaxy Tab S6 Lite",
+    "description": "A versatile tablet with an S Pen included, ideal for sketching, note-taking, and entertainment.",
+    "price": 31999
+  },
+  {
+    "name": "Samsung Galaxy Tab A7",
+    "description": "An affordable yet feature-packed tablet with a large display, quad speakers, and long-lasting battery life.",
+    "price": 18999
+  },
+  {
+    "name": "Samsung Galaxy Tab S5e",
+    "description": "A slim and lightweight tablet with AMOLED display, quad speakers, and Samsung DeX support.",
+    "price": 35999
+  },
+  {
+    "name": "Samsung Galaxy Tab S6",
+    "description": "The predecessor to the Tab S7+ with an AMOLED display, S Pen support, and powerful hardware.",
+    "price": 52999
+  },
+  {
+    "name": "Microsoft Surface Pro 7",
+    "description": "A versatile 2-in-1 laptop-tablet hybrid with a high-resolution touchscreen and powerful performance.",
+    "price": 79999
+  },
+  {
+    "name": "Microsoft Surface Go 2",
+    "description": "A compact and lightweight tablet with a detachable keyboard, ideal for everyday tasks and entertainment.",
+    "price": 42999
+  },
+  {
+    "name": "Microsoft Surface Book 3",
+    "description": "A premium convertible laptop with a detachable touchscreen, dedicated GPU, and long battery life.",
+    "price": 129999
+  },
+  {
+    "name": "Microsoft Surface Pro X",
+    "description": "An ultra-slim and lightweight tablet with an ARM-based processor and all-day battery life.",
+    "price": 89999
+  },
+  {
+    "name": "Microsoft Surface Go",
+    "description": "An affordable and portable tablet with a premium build quality and optional keyboard cover.",
+    "price": 32999
+  },
+  {
+    "name": "Huawei MatePad Pro",
+    "description": "A premium Android tablet with a stunning display, powerful performance, and long battery life.",
+    "price": 54999
+  },
+  {
+    "name": "Huawei MatePad 11",
+    "description": "A sleek and stylish tablet with a high-refresh-rate display, ideal for multimedia consumption and productivity.",
+    "price": 37999
+  },
+  {
+    "name": "Huawei MatePad T10s",
+    "description": "An affordable and family-friendly tablet with a large display and dual speakers.",
+    "price": 18999
+  },
+  {
+    "name": "Huawei MediaPad M6",
+    "description": "A compact and portable tablet with a high-resolution display and quad speakers.",
+    "price": 26999
+  },
+  {
+    "name": "Huawei MediaPad T5",
+    "description": "An entry-level tablet with a large display and decent performance, suitable for casual users.",
+    "price": 14999
+  },
+  {
+    "name": "Logitech MX Master 3 Wireless Mouse",
+    "description": "An advanced wireless mouse with customizable buttons, ergonomic design, and precise tracking.",
+    "price": 6999
+  },
+  {
+    "name": "Logitech G Pro X Mechanical Gaming Keyboard",
+    "description": "A high-performance mechanical gaming keyboard with customizable RGB lighting and swappable switches.",
+    "price": 9999
+  },
+  {
+    "name": "Logitech C920 HD Pro Webcam",
+    "description": "A high-definition webcam with autofocus and stereo audio for crystal-clear video calls and streaming.",
+    "price": 4999
+  },
+  {
+    "name": "Logitech G733 Lightspeed Wireless Gaming Headset",
+    "description": "A lightweight and comfortable gaming headset with vibrant RGB lighting and immersive audio.",
+    "price": 8999
+  },
+  {
+    "name": "Logitech K380 Multi-Device Bluetooth Keyboard",
+    "description": "A compact and versatile Bluetooth keyboard that can connect to multiple devices with ease.",
+    "price": 2999
+  },
+  {
+    "name": "JBL Flip 5 Portable Bluetooth Speaker",
+    "description": "A waterproof portable speaker with powerful sound and up to 12 hours of battery life.",
+    "price": 8999
+  },
+  {
+    "name": "JBL Tune 500BT Wireless On-Ear Headphones",
+    "description": "Comfortable wireless headphones with JBL Pure Bass sound and up to 16 hours of battery life.",
+    "price": 2999
+  },
+  {
+    "name": "JBL Free X Truly Wireless Earbuds",
+    "description": "True wireless earbuds with JBL Signature Sound and up to 24 hours of combined playback time.",
+    "price": 5999
+  },
+  {
+    "name": "JBL Charge 4 Portable Bluetooth Speaker",
+    "description": "A rugged portable speaker with powerful bass and a built-in power bank to charge your devices.",
+    "price": 11999
+  },
+  {
+    "name": "JBL Live 300TWS True Wireless Earbuds",
+    "description": "Wireless earbuds with ambient aware and talkthru features for a personalized listening experience.",
+    "price": 7999
+  },
+  {
+    "name": "Belkin Boost Charge USB-C Wall Charger",
+    "description": "Fast charging wall charger with USB-C port for smartphones, tablets, and other USB-C devices.",
+    "price": 1499
+  },
+  {
+    "name": "Belkin Pocket Power 10000mAh Power Bank",
+    "description": "Portable power bank with 10,000mAh capacity for charging smartphones and other devices on-the-go.",
+    "price": 1999
+  },
+  {
+    "name": "Belkin Wireless Charging Pad",
+    "description": "Qi-certified wireless charging pad compatible with smartphones and other Qi-enabled devices.",
+    "price": 2499
+  },
+  {
+    "name": "Belkin MIXIT Lightning to USB Cable",
+    "description": "High-quality Lightning to USB cable for fast charging and data syncing with Apple devices.",
+    "price": 899
+  },
+  {
+    "name": "Belkin Boost Up Wireless Charging Stand",
+    "description": "Qi-certified wireless charging stand with adjustable design for comfortable viewing while charging.",
+    "price": 3499
+  },
+  {
+    "name": "Anker PowerCore 10000mAh Power Bank",
+    "description": "Ultra-compact portable power bank with 10,000mAh capacity for charging smartphones and other devices on-the-go.",
+    "price": 1499
+  },
+  {
+    "name": "Anker Soundcore Bluetooth Speaker",
+    "description": "Portable Bluetooth speaker with high-quality sound, waterproof design, and long battery life.",
+    "price": 2499
+  },
+  {
+    "name": "Anker PowerPort Wall Charger",
+    "description": "Compact wall charger with multiple ports for charging smartphones, tablets, and other devices simultaneously.",
+    "price": 1999
+  },
+  {
+    "name": "Anker PowerLine+ Lightning Cable",
+    "description": "Premium Lightning to USB cable with reinforced design for durability and fast charging of Apple devices.",
+    "price": 799
+  },
+  {
+    "name": "Anker PowerDrive Car Charger",
+    "description": "Compact car charger with multiple USB ports for charging devices while on the road.",
+    "price": 999
+  },
+  {
+    "name": "Organic Apples",
+    "description": "Fresh and crisp organic apples, perfect for snacking or baking.",
+    "price": 99
+  },
+  {
+    "name": "Organic Bananas",
+    "description": "Nutritious and ripe organic bananas, great for smoothies or a quick snack.",
+    "price": 79
+  },
+  {
+    "name": "Fresh Strawberries",
+    "description": "Juicy and sweet strawberries, ideal for desserts or adding to salads.",
+    "price": 129
+  },
+  {
+    "name": "Organic Spinach",
+    "description": "Fresh and tender organic spinach leaves, perfect for salads or sautéing.",
+    "price": 69
+  },
+  {
+    "name": "Fresh Avocados",
+    "description": "Creamy and nutritious avocados, perfect for making guacamole or adding to salads.",
+    "price": 89
+  },
+  {
+    "name": "Lay's Classic Potato Chips",
+    "description": "Traditional and crispy potato chips seasoned with just the right amount of salt.",
+    "price": 49
+  },
+  {
+    "name": "Lay's Sour Cream & Onion Potato Chips",
+    "description": "Tangy and savory potato chips with the perfect blend of sour cream and onion flavors.",
+    "price": 59
+  },
+  {
+    "name": "Lay's Barbecue Potato Chips",
+    "description": "Smoky and sweet potato chips with a rich barbecue seasoning that's irresistible.",
+    "price": 54
+  },
+  {
+    "name": "Lay's Salt & Vinegar Potato Chips",
+    "description": "Tangy and salty potato chips with a zesty vinegar flavor that packs a punch.",
+    "price": 59
+  },
+  {
+    "name": "Lay's Wavy Ranch Potato Chips",
+    "description": "Wavy-cut potato chips with a creamy ranch seasoning that's both flavorful and satisfying.",
+    "price": 54
+  },
+  {
+    "name": "Doritos Nacho Cheese Tortilla Chips",
+    "description": "Bold and cheesy tortilla chips with a zesty nacho cheese flavor.",
+    "price": 49
+  },
+  {
+    "name": "Doritos Cool Ranch Tortilla Chips",
+    "description": "Cool and tangy tortilla chips seasoned with ranch flavoring for a refreshing taste.",
+    "price": 54
+  },
+  {
+    "name": "Doritos Spicy Nacho Tortilla Chips",
+    "description": "Spicy and bold tortilla chips with a fiery nacho flavor for those who crave heat.",
+    "price": 59
+  }
+]
