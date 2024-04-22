@@ -1,12 +1,26 @@
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+} from 'class-validator';
 
 export class SignUpRequestBodyDto {
+  @IsNotEmpty()
   @IsString()
-  name: string;
+  readonly name: string;
 
   @IsEmail()
-  email: string;
+  readonly email: string;
+
+  @IsNotEmpty()
+  @IsStrongPassword()
+  readonly password: string;
+}
+export class LoginRequestDto {
+  @IsEmail()
+  readonly email: string;
 
   @IsStrongPassword()
-  password: string;
+  readonly password: string;
 }
