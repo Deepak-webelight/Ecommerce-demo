@@ -25,8 +25,6 @@ export class ProductService {
       if (name) filterQuery.name = name;
       if (q) filterQuery.description = { $regex: q, $options: 'i' };
 
-      console.log('filterQuery', filterQuery);
-
       // Get Products based on filters
       const products = await this.productsModel
         .find(filterQuery)
