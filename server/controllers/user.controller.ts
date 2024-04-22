@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ILoginRequestbody, IResisterRequestbody } from "../routes/user.routes";
-import { IgenerateToken, UserService } from "../services/user.service";
+import { UserService } from "../services/user.service";
 import responseProvider from "../utils/responseProvider.utils";
 import { tokenFormat } from "../utils/constants.utils";
 
@@ -13,14 +13,14 @@ export class UserController {
       const { email, name, password }: IResisterRequestbody = req.body;
 
       // call user service to register new user
-      const newUser = await userService.resisterNewUser({
+      const { _id } = await userService.resisterNewUser({
         name,
         email,
         password,
       });
 
       // Call user service to generate tokens
-      const { token, refreshToken } = userService.generateTokens(newUser._id);
+      const { token, refreshToken } = userService.generateTokens(_id);
 
       return responseProvider.sendResponse({
         message: "User Created Successfully",
@@ -79,31 +79,32 @@ export class UserController {
       const authorization = req.headers.authorization as string;
       const token = authorization?.split(" ")[1];
 
-      // call user service to extract data from token
-      const { userId } = userService.verifyToken(token) as IgenerateToken;
-
-      // call user service to retrieve new token
-      const newToken = userService.createNewToken(userId, "1d");
+      // call user service to varify and generate new token
+      const newToken = await userService.refreshToken(token);
 
       return responseProvider.sendResponse({
         message: "token refreshed",
         response: res,
         statusCode: 200,
-        data: {
-          token: newToken,
-        },
+        cookie: [
+          {
+            name: "token",
+            value: tokenFormat(newToken),
+          },
+        ],
       });
     } catch (err) {
+
       return responseProvider.InternalServerError({
         error: err as Error,
         response: res,
+        message: (err as Error).message,
       });
     }
   }
   async userLogout(req: Request, res: Response) {
     try {
-      
-      //  clear cookies 
+      //  clear cookies
       responseProvider.clearCookies({
         name: "token",
         response: res,

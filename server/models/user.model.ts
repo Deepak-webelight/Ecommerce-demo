@@ -25,7 +25,7 @@ const userModelSchema = new Schema<IuserDocument>(
       required: true,
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 const userModel = model<IuserDocument>("User", userModelSchema);
