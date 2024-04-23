@@ -8,6 +8,7 @@ import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
 import { Iconfiguration } from './user.interface';
+import { Role } from './user.roleGuard';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
   async registerNewUser(body: SignUpRequestBodyDto) {
     try {
       // Extract data from request body
-      const { name, email, password } = body;
+      const { name, email, password, role } = body;
 
       // Validate does user exist
       const isexist = await this.isExist(email);
@@ -33,6 +34,7 @@ export class UserService {
         email,
         name,
         password: userHashedPassword,
+        role,
       });
 
       return user;
@@ -48,14 +50,14 @@ export class UserService {
       return false;
     }
   }
-  generateTokens(userId: mongoose.Types.ObjectId) {
+  generateTokens(userId: mongoose.Types.ObjectId, role: keyof typeof Role) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
-      { userId: userId },
+      { userId, role },
       { expiresIn: this.configService.get('tokenExpiry') },
     );
     const refreshToken = this.jwtService.sign(
-      { userId: userId },
+      { userId, role },
       {
         expiresIn: this.configService.get('refreshTokenExpiry'),
       },
@@ -90,17 +92,10 @@ export class UserService {
 
   async refreshToken(req: Request) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      console.log(req.cookies);
-
-      if (!refreshToken) {
-        throw new BadRequestException('No refresh token provided');
-      }
-
-      const { userId } = this.jwtService.verify(refreshToken);
+      const { userId, role } = req['user'];
 
       const token = this.jwtService.sign(
-        { userId },
+        { userId, role },
         { expiresIn: this.configService.get('tokenExpiry') },
       );
 

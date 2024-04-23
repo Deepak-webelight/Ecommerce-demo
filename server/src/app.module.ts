@@ -8,6 +8,9 @@ import configuration from './appConfig/configuration';
 import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';
 import { Iconfiguration } from './modules/user/user.interface';
+import { AuthGuard } from './modules/user/user.authGuard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './modules/user/user.roleGuard';
 
 @Module({
   imports: [
@@ -27,6 +30,16 @@ import { Iconfiguration } from './modules/user/user.interface';
     userModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

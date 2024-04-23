@@ -6,4 +6,5 @@ export default Joi.object({
   JWT_SECRET: Joi.string().required(),
   TOKEN_EXPIRY: Joi.alternatives(Joi.string(), Joi.number()).required(),
   REFRESH_TOKEN_EXPIRY: Joi.alternatives(Joi.string(), Joi.number()).required(),
+  
 });

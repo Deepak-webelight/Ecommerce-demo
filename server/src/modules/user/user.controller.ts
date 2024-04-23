@@ -12,10 +12,14 @@ import { UserService } from './user.service';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
+import { PublicRoute } from './user.authGuard';
+import { Role, Roles } from './user.roleGuard';
 
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @PublicRoute()
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
@@ -26,7 +30,10 @@ export class UserController {
       const { _id } = await this.userService.registerNewUser(body);
 
       // call UserService to generate new tokens
-      const { token, refreshToken } = this.userService.generateTokens(_id);
+      const { token, refreshToken } = this.userService.generateTokens(
+        _id,
+        body.role,
+      );
 
       res.cookie('token', tokenFormat(token), {
         httpOnly: true,
@@ -46,6 +53,7 @@ export class UserController {
     }
   }
 
+  @PublicRoute()
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
@@ -53,10 +61,13 @@ export class UserController {
   ): Promise<IUserResponse> {
     try {
       // call user Service to authenticate user
-      const { _id } = await this.userService.authenticate(body);
+      const { _id, role } = await this.userService.authenticate(body);
 
       // call UserService to generate new tokens
-      const { token, refreshToken } = this.userService.generateTokens(_id);
+      const { token, refreshToken } = this.userService.generateTokens(
+        _id,
+        role as keyof typeof Role,
+      );
 
       res.cookie('token', tokenFormat(token), {
         httpOnly: true,
@@ -91,6 +102,7 @@ export class UserController {
     }
   }
 
+  
   @Post('refresh')
   async refreshToken(
     @Req() req: Request,

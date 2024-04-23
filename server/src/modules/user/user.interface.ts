@@ -4,6 +4,7 @@ export interface Iconfiguration {
   jwtSecret: string;
   tokenExpiry: string | number;
   refreshTokenExpiry: string | number;
+ 
 }
 export interface IUserResponse {
   message: string;
