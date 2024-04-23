@@ -4,32 +4,52 @@ import {
   Controller,
   Get,
   HttpStatus,
-  ParseIntPipe,
+  Post,
   Query,
-  UsePipes,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { IproductsRouteResponse } from './products.interface';
-import { BodyDto, QueryDto } from './products.dto';
+import {
+  FilterRequestBodyDto,
+  ProductRequestBodyDto,
+  QueryDto,
+} from './products.dto';
 
 @Controller('/products')
 export class ProductController {
   constructor(private productservice: ProductService) {}
 
   @Get('/filters')
-  async getAllProducts(
+  async filterProducts(
     @Query() query: QueryDto,
-    @Body() body: BodyDto,
+    @Body() body: FilterRequestBodyDto,
   ): Promise<IproductsRouteResponse> {
     try {
-      
       // Call product service to get filtered products
-      const products = await this.productservice.getAllProducts(query, body);
+      const products = await this.productservice.getFilterProducts(query, body);
 
       return {
         data: products,
-        message: 'all products',
+        message: 'all filter products fetched successfully',
         statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Post('createProduct')
+  async createProduct(
+    @Body() body: ProductRequestBodyDto,
+  ): Promise<IproductsRouteResponse> {
+    try {
+      // Call product service to create product
+      // const product = await this.productservice.createProduct(body);
+
+      return {
+        data: body,
+        message: 'product created successfully',
+        statusCode: HttpStatus.CREATED,
       };
     } catch (err) {
       throw new BadRequestException(err.message);

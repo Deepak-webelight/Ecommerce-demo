@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { products } from './products.model';
 import { Model } from 'mongoose';
-import { BodyDto } from './products.dto';
+import { FilterRequestBodyDto } from './products.dto';
 import { IfilterQuery } from './products.interface';
 import { defaultPageLimit, defaultPageNumber } from 'src/utils/constants';
 
@@ -13,7 +13,7 @@ export class ProductService {
     private configService: ConfigService,
     @InjectModel(products.name) private productsModel: Model<products>,
   ) {}
-  async getAllProducts(query, body: BodyDto) {
+  async getFilterProducts(query, body: FilterRequestBodyDto) {
     try {
       // extract default body parameters
       const { name, q } = body;

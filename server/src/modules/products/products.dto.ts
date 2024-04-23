@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsEmpty, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsEmpty,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class QueryDto {
   @Type(() => Number)
@@ -16,7 +24,7 @@ export class QueryDto {
   readonly limit?: number;
 }
 
-export class BodyDto {
+export class FilterRequestBodyDto {
   @IsOptional()
   @IsString()
   @IsEmpty()
@@ -26,4 +34,18 @@ export class BodyDto {
   @IsString()
   @IsEmpty()
   name?: string;
+}
+
+export class ProductRequestBodyDto {
+  @IsEmpty()
+  @IsString()
+  name: string;
+
+  @IsEmpty()
+  @IsString()
+  description: string;
+
+  @IsEmpty()
+  @IsNumber()
+  price: number;
 }
