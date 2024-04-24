@@ -19,8 +19,8 @@ import { Iconfiguration } from './modules/user/user.interface';
     JwtModule.registerAsync({
       inject: [ConfigService],
       global: true,
-      useFactory: (config: ConfigService<Iconfiguration>) => ({
-        secret: config.get<string>('jwtSecret'),
+      useFactory: (configService: ConfigService<Iconfiguration>) => ({
+        secret: configService.get('jwtSecret'),
       }),
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),

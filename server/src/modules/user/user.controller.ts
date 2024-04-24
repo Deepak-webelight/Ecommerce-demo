@@ -6,16 +6,23 @@ import {
   Res,
   Req,
   BadRequestException,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
-import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
+import {
+  LoginRequestDto,
+  SignUpRequestBodyDto,
+  getUserDetailsByidDto,
+} from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
 
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
+  // create a new user
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
@@ -46,6 +53,7 @@ export class UserController {
     }
   }
 
+  // login an existing user
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
@@ -76,6 +84,7 @@ export class UserController {
     }
   }
 
+  // logout an existing user
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     try {
@@ -91,6 +100,7 @@ export class UserController {
     }
   }
 
+  // refresh an expired token
   @Post('refresh')
   async refreshToken(
     @Req() req: Request,
@@ -110,6 +120,26 @@ export class UserController {
       };
     } catch (error) {
       throw new BadRequestException(error.response);
+    }
+  }
+
+  // get user information by id
+  @Get('/:id')
+  async getUserById(
+    @Param() param: getUserDetailsByidDto,
+  ): Promise<IUserResponse> {
+    try {
+      console.log('getUserById', param);
+      // call user service to extract user information
+      // const user = await this.userService.getUserById(id);
+
+      return {
+        message: 'User information fetched successfully',
+        // data: user,
+        status: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.response);
     }
   }
 }

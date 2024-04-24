@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumberString,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
@@ -24,4 +25,10 @@ export class LoginRequestDto {
 
   @IsStrongPassword()
   readonly password: string;
+}
+
+export class getUserDetailsByidDto {
+  @IsNumberString()
+  @IsNotEmpty()
+  id: string;
 }

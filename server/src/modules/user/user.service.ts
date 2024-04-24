@@ -109,4 +109,12 @@ export class UserService {
       throw new BadRequestException(err.message);
     }
   }
+
+  async getUserById(id: string): Promise<User> {
+    try {
+      return await this.userModel.findById(id);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }
