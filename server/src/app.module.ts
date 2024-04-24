@@ -1,32 +1,25 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './modules/user/user.module';
-import configuration from './appConfig/configuration';
-import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';
-import { Iconfiguration } from './modules/user/user.interface';
-import { AuthGuard } from './modules/user/user.authGuard';
+import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './modules/user/user.roleGuard';
+import { RolesGuard } from './guards/role-auth.guard';
+import appConfig from './appConfig/configuration';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validationSchema: configValidation,
-      load: [configuration],
       isGlobal: true,
     }),
-    JwtModule.registerAsync({
-      inject: [ConfigService],
+    JwtModule.register({
       global: true,
-      useFactory: (config: ConfigService<Iconfiguration>) => ({
-        secret: config.get<string>('jwtSecret'),
-      }),
+      secret: appConfig('JWT_SECRET'),
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot(appConfig('MONGODB_URL')),
     userModule,
   ],
   controllers: [AppController],

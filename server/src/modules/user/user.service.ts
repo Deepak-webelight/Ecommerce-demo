@@ -1,19 +1,17 @@
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import mongoose, { Model } from 'mongoose';
-import { ConfigService } from '@nestjs/config';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
-import { Iconfiguration } from './user.interface';
-import { Role } from './user.roleGuard';
+import { Role } from '../../guards/role-auth.guard';
+import appConfig from 'src/appConfig/configuration';
 
 @Injectable()
 export class UserService {
   constructor(
-    private configService: ConfigService<Iconfiguration>,
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
@@ -21,7 +19,7 @@ export class UserService {
   async registerNewUser(body: SignUpRequestBodyDto) {
     try {
       // Extract data from request body
-      const { name, email, password, role } = body;
+      const { name, email, password } = body;
 
       // Validate does user exist
       const isexist = await this.isExist(email);
@@ -34,7 +32,7 @@ export class UserService {
         email,
         name,
         password: userHashedPassword,
-        role,
+        role: Role.User, // by default user role only
       });
 
       return user;
@@ -50,16 +48,16 @@ export class UserService {
       return false;
     }
   }
-  generateTokens(userId: mongoose.Types.ObjectId, role: keyof typeof Role) {
+  generateTokens(userId: Types.ObjectId, role: number) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
       { userId, role },
-      { expiresIn: this.configService.get('tokenExpiry') },
+      { expiresIn: appConfig('TOKEN_EXPIRY') },
     );
     const refreshToken = this.jwtService.sign(
       { userId, role },
       {
-        expiresIn: this.configService.get('refreshTokenExpiry'),
+        expiresIn: appConfig('REFRESH_TOKEN_EXPIRY'),
       },
     );
 
@@ -96,10 +94,41 @@ export class UserService {
 
       const token = this.jwtService.sign(
         { userId, role },
-        { expiresIn: this.configService.get('tokenExpiry') },
+        { expiresIn: appConfig('TOKEN_EXPIRY') },
       );
 
       return token;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async registerAdminUser(apiKey: string, body: SignUpRequestBodyDto) {
+    try {
+      // validate valid api key
+      const varify = apiKey === appConfig('X_API_KEY');
+      if (!varify) throw new BadRequestException('Invalid api key');
+
+      // extract data from request body
+      const { email, name, password } = body;
+
+      // if User already has existing
+
+      const adminUser = await this.isExist(email);
+
+      if (adminUser) {
+        throw new BadRequestException('User already exists');
+      }
+
+      // hash password
+      const hashpassword = await createHashPassword(password);
+
+      return await this.userModel.create({
+        name,
+        email,
+        password: hashpassword,
+        role: Role.Admin,
+      });
     } catch (err) {
       throw new BadRequestException(err.message);
     }

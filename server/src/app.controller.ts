@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
-import { PublicRoute } from './modules/user/user.authGuard';
+import { PublicRoute } from './guards/auth.guard';
 
 @Controller()
 export class AppController {

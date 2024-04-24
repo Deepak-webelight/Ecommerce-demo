@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Role } from './user.roleGuard';
+import { Role } from '../../guards/role-auth.guard';
 
 @Schema({
   timestamps: true,
@@ -22,8 +22,9 @@ export class User {
   @Prop({
     required: true,
     enum: Role,
+    default: Role.User,
   })
-  role: string;
+  role: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

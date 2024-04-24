@@ -6,14 +6,16 @@ import {
   Res,
   Req,
   BadRequestException,
+  Headers,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
-import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
+import { HeaderDto, LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
-import { PublicRoute } from './user.authGuard';
-import { Role, Roles } from './user.roleGuard';
+import { PublicRoute } from '../../guards/auth.guard';
+import { Role } from 'src/guards/role-auth.guard';
 
 @Controller('/user')
 export class UserController {
@@ -26,13 +28,12 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<IUserResponse> {
     try {
-      // call UserService to register the user
       const { _id } = await this.userService.registerNewUser(body);
 
       // call UserService to generate new tokens
       const { token, refreshToken } = this.userService.generateTokens(
         _id,
-        body.role,
+        Role.User,
       );
 
       res.cookie('token', tokenFormat(token), {
@@ -66,7 +67,7 @@ export class UserController {
       // call UserService to generate new tokens
       const { token, refreshToken } = this.userService.generateTokens(
         _id,
-        role as keyof typeof Role,
+        role,
       );
 
       res.cookie('token', tokenFormat(token), {
@@ -102,7 +103,6 @@ export class UserController {
     }
   }
 
-  
   @Post('refresh')
   async refreshToken(
     @Req() req: Request,
@@ -119,6 +119,48 @@ export class UserController {
       return {
         message: 'Token refreshed successfully',
         status: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
+  }
+
+  @PublicRoute()
+  @Post('/admin')
+  async createNewAdminUser(
+    @Headers() headers: HeaderDto,
+    @Body() body: SignUpRequestBodyDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IUserResponse> {
+    try {
+      const xApiKey = headers['x-api-key'];
+
+      if (!xApiKey)
+        throw new UnauthorizedException('x-api-key key not provided');
+
+      // call User Service to varify and resister admin user
+      const { _id, role } = await this.userService.registerAdminUser(
+        xApiKey,
+        body,
+      );
+
+      const { token, refreshToken } = await this.userService.generateTokens(
+        _id,
+        role,
+      );
+
+      res.cookie('token', tokenFormat(token), {
+        httpOnly: true,
+        sameSite: 'strict',
+      });
+      res.cookie('refreshToken', tokenFormat(refreshToken), {
+        httpOnly: true,
+        sameSite: 'strict',
+      });
+
+      return {
+        message: 'Admin User Created Successfully',
+        status: HttpStatus.CREATED,
       };
     } catch (error) {
       throw new BadRequestException(error.response);

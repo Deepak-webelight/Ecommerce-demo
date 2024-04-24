@@ -1,11 +1,9 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { Role } from './user.roleGuard';
 
 export class SignUpRequestBodyDto {
   @IsNotEmpty()
@@ -18,17 +16,20 @@ export class SignUpRequestBodyDto {
   @IsNotEmpty()
   @IsStrongPassword()
   readonly password: string;
-
-  @IsNotEmpty()
-  @IsEnum(Role)
-  @IsString()
-  readonly role: keyof typeof Role;
 }
 
 export class LoginRequestDto {
+  @IsNotEmpty()
   @IsEmail()
   readonly email: string;
 
-  @IsStrongPassword()
+  @IsString()
+  @IsNotEmpty()
   readonly password: string;
+}
+
+export class HeaderDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly 'x-api-key': string;
 }
