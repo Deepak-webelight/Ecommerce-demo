@@ -9,7 +9,6 @@ export class AppController {
   @PublicRoute()
   @Get()
   getHello(): string {
-    console.log(appConfig);
     return this.appService.getHello();
   }
 }
