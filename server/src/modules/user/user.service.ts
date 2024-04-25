@@ -41,6 +41,7 @@ export class UserService {
   }
   async isExist(email: string) {
     const user = await this.userModel.exists({ email });
+    console.log(user)
     if (user) {
       return true;
     } else {
