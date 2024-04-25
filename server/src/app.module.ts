@@ -7,19 +7,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/role-auth.guard';
-import appConfig from './appConfig/configuration';
-import { ConfigModule } from '@nestjs/config';
+import { appConfig } from './appConfig/configuration';
+import { SuperAdminAuthGuard } from './guards/superAdmin.auth.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     JwtModule.register({
       global: true,
-      secret: appConfig('JWT_SECRET'),
+      secret: appConfig.jwtSecret,
     }),
-    MongooseModule.forRoot(appConfig('MONGODB_URL')),
+    MongooseModule.forRoot(appConfig.mongodbUrl),
     userModule,
   ],
   controllers: [AppController],
@@ -32,6 +29,10 @@ import { ConfigModule } from '@nestjs/config';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SuperAdminAuthGuard,
     },
   ],
 })

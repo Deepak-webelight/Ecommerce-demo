@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import appConfig from 'src/appConfig/configuration';
+import { RolesKey } from 'src/utils/constants';
 
 export enum Role {
   User,
@@ -14,7 +14,7 @@ export enum Role {
 }
 
 // Role decorator
-export const Roles = (roles: Role) => SetMetadata(appConfig('ROLES_KEY'), roles);
+export const Roles = (role: Role) => SetMetadata(RolesKey, role);
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -22,10 +22,10 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
-      const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
-        appConfig('ROLES_KEY'),
-        [context.getHandler(), context.getClass()],
-      );
+      const requiredRoles = this.reflector.getAllAndOverride<Role[]>(RolesKey, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
       if (!requiredRoles) {
         return true;
       }

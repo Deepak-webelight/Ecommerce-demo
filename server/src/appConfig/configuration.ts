@@ -1,6 +1,16 @@
-import { Iconfiguration } from 'src/modules/user/user.interface';
+import { config } from 'dotenv';
+import { CookieOptions } from 'express';
+config();
 
-const appConfig = (requestedEnv: keyof Iconfiguration) => {
-  return process.env[requestedEnv];
+export const appConfig = {
+  port: process.env.PORT,
+  mongodbUrl: process.env.MONGODB_URL,
+  jwtSecret: process.env.JWT_SECRET,
+  xApiKey: process.env.X_API_KEY,
 };
-export default appConfig;
+
+export const cookieConfiguration: CookieOptions = {
+  httpOnly: true,
+  sameSite: 'strict',
+};
+

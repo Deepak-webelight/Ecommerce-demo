@@ -7,7 +7,7 @@ import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
 import { Role } from '../../guards/role-auth.guard';
-import appConfig from 'src/appConfig/configuration';
+import { RefreshTokenExpiry, TokenExpiry } from 'src/utils/constants';
 
 @Injectable()
 export class UserService {
@@ -28,20 +28,19 @@ export class UserService {
       // create a new hashpassword for the user
       const userHashedPassword = await createHashPassword(password);
 
-      const user = await this.userModel.create({
+      const { _id, role } = await this.userModel.create({
         email,
         name,
         password: userHashedPassword,
-        role: Role.User, // by default user role only
       });
-
-      return user;
+      // call generateTokens to return the tokens
+      return this.generateTokens(_id, role);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
   async isExist(email: string) {
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.exists({ email });
     if (user) {
       return true;
     } else {
@@ -52,12 +51,12 @@ export class UserService {
     // generate new token and refresh token
     const token = this.jwtService.sign(
       { userId, role },
-      { expiresIn: appConfig('TOKEN_EXPIRY') },
+      { expiresIn: TokenExpiry },
     );
     const refreshToken = this.jwtService.sign(
       { userId, role },
       {
-        expiresIn: appConfig('REFRESH_TOKEN_EXPIRY'),
+        expiresIn: RefreshTokenExpiry,
       },
     );
 
@@ -82,7 +81,7 @@ export class UserService {
         throw new BadRequestException('Invalid password');
       }
 
-      return user;
+      return this.generateTokens(user._id, user.role);
     } catch (err) {
       throw new BadRequestException(err.message || 'Authentication failed');
     }
@@ -94,7 +93,7 @@ export class UserService {
 
       const token = this.jwtService.sign(
         { userId, role },
-        { expiresIn: appConfig('TOKEN_EXPIRY') },
+        { expiresIn: TokenExpiry },
       );
 
       return token;
@@ -103,17 +102,12 @@ export class UserService {
     }
   }
 
-  async registerAdminUser(apiKey: string, body: SignUpRequestBodyDto) {
+  async registerAdminUser(body: SignUpRequestBodyDto) {
     try {
-      // validate valid api key
-      const varify = apiKey === appConfig('X_API_KEY');
-      if (!varify) throw new BadRequestException('Invalid api key');
-
       // extract data from request body
       const { email, name, password } = body;
 
       // if User already has existing
-
       const adminUser = await this.isExist(email);
 
       if (adminUser) {
@@ -123,12 +117,14 @@ export class UserService {
       // hash password
       const hashpassword = await createHashPassword(password);
 
-      return await this.userModel.create({
+      const { _id, role } = await this.userModel.create({
         name,
         email,
         password: hashpassword,
         role: Role.Admin,
       });
+
+      return this.generateTokens(_id, role);
     } catch (err) {
       throw new BadRequestException(err.message);
     }

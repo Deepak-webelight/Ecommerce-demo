@@ -27,9 +27,3 @@ export class LoginRequestDto {
   @IsNotEmpty()
   readonly password: string;
 }
-
-export class HeaderDto {
-  @IsString()
-  @IsNotEmpty()
-  readonly 'x-api-key': string;
-}
