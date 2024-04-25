@@ -26,7 +26,7 @@ export class LoginRequestDto {
   readonly password: string;
 }
 
-export class getUserDetailsByidDto {
+export class getUserDetailsByIdDto {
   @IsNotEmpty()
   id: string;
 }

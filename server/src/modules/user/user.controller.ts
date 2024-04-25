@@ -17,7 +17,7 @@ import {
   LoginRequestDto,
   SignUpRequestBodyDto,
   UpdateUserDataRequestBodyDto,
-  getUserDetailsByidDto,
+  getUserDetailsByIdDto,
 } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
@@ -56,7 +56,6 @@ export class UserController {
     }
   }
 
-  
   // login an existing user
   @Post('login')
   async login(
@@ -128,9 +127,9 @@ export class UserController {
   }
 
   // get user information by id
-  @Get(':id') // letter on dont take :id  as we are saving userid on token thus take it from there
+  @Get(':id')
   async getUserById(
-    @Param() { id }: getUserDetailsByidDto,
+    @Param() { id }: getUserDetailsByIdDto,
   ): Promise<IUserResponse> {
     try {
       // call user service to extract user information
@@ -147,7 +146,7 @@ export class UserController {
   }
   @Patch(':id')
   async updateUserDetails(
-    @Param() { id }: getUserDetailsByidDto,
+    @Param() { id }: getUserDetailsByIdDto,
     @Body() body: UpdateUserDataRequestBodyDto,
   ): Promise<IUserResponse> {
     try {
@@ -165,7 +164,7 @@ export class UserController {
 
   @Delete('/:id')
   async deleteUser(
-    @Param() { id }: getUserDetailsByidDto,
+    @Param() { id }: getUserDetailsByIdDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<IUserResponse> {
     try {
