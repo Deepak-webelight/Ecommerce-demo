@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import {
-  IsEmpty,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,7 +9,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class QueryDto {
+export class PaginationDto {
   @Type(() => Number)
   @IsOptional()
   @IsInt()
@@ -27,25 +27,23 @@ export class QueryDto {
 export class FilterRequestBodyDto {
   @IsOptional()
   @IsString()
-  @IsEmpty()
-  q?: string;
+  readonly q?: string;
 
   @IsOptional()
   @IsString()
-  @IsEmpty()
-  name?: string;
+  readonly name?: string;
 }
 
 export class ProductRequestBodyDto {
-  @IsEmpty()
+  @IsNotEmpty()
   @IsString()
-  name: string;
+  readonly name: string;
 
-  @IsEmpty()
+  @IsNotEmpty()
   @IsString()
-  description: string;
+  readonly description: string;
 
-  @IsEmpty()
+  @IsNotEmpty()
   @IsNumber()
-  price: number;
+  readonly price: number;
 }

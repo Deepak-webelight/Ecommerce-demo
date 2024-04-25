@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
@@ -12,7 +14,7 @@ import { IproductsRouteResponse } from './products.interface';
 import {
   FilterRequestBodyDto,
   ProductRequestBodyDto,
-  QueryDto,
+  PaginationDto,
 } from './products.dto';
 
 @Controller('/products')
@@ -21,7 +23,7 @@ export class ProductController {
 
   @Get('/filters')
   async filterProducts(
-    @Query() query: QueryDto,
+    @Query() query: PaginationDto,
     @Body() body: FilterRequestBodyDto,
   ): Promise<IproductsRouteResponse> {
     try {
@@ -38,18 +40,54 @@ export class ProductController {
     }
   }
 
-  @Post('createProduct')
+  @Post()
   async createProduct(
     @Body() body: ProductRequestBodyDto,
   ): Promise<IproductsRouteResponse> {
     try {
       // Call product service to create product
-      // const product = await this.productservice.createProduct(body);
+      const product = await this.productservice.createProduct(body);
 
       return {
-        data: body,
+        data: product,
         message: 'product created successfully',
         statusCode: HttpStatus.CREATED,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  @Get('/:id')
+  async getProductById(
+    @Param('id') id: string,
+  ): Promise<IproductsRouteResponse> {
+    try {
+      // call product service to extract product data
+      const product = await this.productservice.getProductDataById(id);
+
+      return {
+        message: 'product data',
+        data: product,
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+  @Delete('/:id')
+  async deleteProductById(
+    @Param('id') id: string,
+  ): Promise<IproductsRouteResponse> {
+    try {
+      // call product service to extract product data
+      const product = await this.productservice.deleteProductDataById(id);
+
+      console.log(product);
+       
+      return {
+        message: 'product deleted successfully',
+        statusCode: HttpStatus.OK,
       };
     } catch (err) {
       throw new BadRequestException(err.message);
