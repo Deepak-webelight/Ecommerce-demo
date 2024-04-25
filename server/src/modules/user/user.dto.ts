@@ -1,11 +1,10 @@
 import {
   IsEmail,
   IsNotEmpty,
-  IsNumberString,
   IsString,
   IsStrongPassword,
+  IsOptional,
 } from 'class-validator';
-
 export class SignUpRequestBodyDto {
   @IsNotEmpty()
   @IsString()
@@ -28,7 +27,16 @@ export class LoginRequestDto {
 }
 
 export class getUserDetailsByidDto {
-  @IsNumberString()
   @IsNotEmpty()
   id: string;
+}
+export class UpdateUserDataRequestBodyDto {
+  @IsOptional()
+  @IsString()
+  readonly name?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsStrongPassword()
+  readonly password?: string;
 }

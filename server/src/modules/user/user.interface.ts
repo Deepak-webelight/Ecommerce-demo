@@ -10,3 +10,7 @@ export interface IUserResponse {
   data?: any;
   status?: number;
 }
+export interface IUpdateUserDetailsfilter {
+  name?: string;
+  password?: string;
+}

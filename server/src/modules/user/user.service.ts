@@ -1,13 +1,17 @@
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
+import {
+  LoginRequestDto,
+  SignUpRequestBodyDto,
+  UpdateUserDataRequestBodyDto,
+} from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
-import { Iconfiguration } from './user.interface';
+import { IUpdateUserDetailsfilter, Iconfiguration } from './user.interface';
 
 @Injectable()
 export class UserService {
@@ -112,7 +116,41 @@ export class UserService {
 
   async getUserById(id: string): Promise<User> {
     try {
-      return await this.userModel.findById(id);
+      return await this.userModel.findById(id, {
+        _id: 0,
+        role: 0,
+        password: 0,
+      });
+    } catch (err) {
+      throw new BadRequestException('User not found');
+    }
+  }
+
+  async updateUserDetails(id: string, body: UpdateUserDataRequestBodyDto) {
+    try {
+      const { name, password } = body;
+      const filterObject: IUpdateUserDetailsfilter = {};
+      if (name) filterObject.name = name;
+
+      if (password) {
+        const hashpassword = await createHashPassword(password);
+        filterObject.password = hashpassword;
+      }
+
+      console.log('updatedUser', id, filterObject);
+
+      return this.userModel
+        .findOneAndUpdate({ _id: id }, filterObject, { new: true })
+        .select('-_id')
+        .select('-password')
+        .select('-role');
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+  async deleteUser(id: string) {
+    try {
+      return await this.userModel.deleteOne({ _id: id });
     } catch (err) {
       throw new BadRequestException(err.message);
     }

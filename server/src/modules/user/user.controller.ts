@@ -8,12 +8,15 @@ import {
   BadRequestException,
   Get,
   Param,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import {
   LoginRequestDto,
   SignUpRequestBodyDto,
+  UpdateUserDataRequestBodyDto,
   getUserDetailsByidDto,
 } from './user.dto';
 import { IUserResponse } from './user.interface';
@@ -53,6 +56,7 @@ export class UserController {
     }
   }
 
+  
   // login an existing user
   @Post('login')
   async login(
@@ -124,19 +128,58 @@ export class UserController {
   }
 
   // get user information by id
-  @Get('/:id')
+  @Get(':id') // letter on dont take :id  as we are saving userid on token thus take it from there
   async getUserById(
-    @Param() param: getUserDetailsByidDto,
+    @Param() { id }: getUserDetailsByidDto,
   ): Promise<IUserResponse> {
     try {
-      console.log('getUserById', param);
       // call user service to extract user information
-      // const user = await this.userService.getUserById(id);
+      const user = await this.userService.getUserById(id);
 
       return {
         message: 'User information fetched successfully',
-        // data: user,
+        data: user,
         status: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.response);
+    }
+  }
+  @Patch(':id')
+  async updateUserDetails(
+    @Param() { id }: getUserDetailsByidDto,
+    @Body() body: UpdateUserDataRequestBodyDto,
+  ): Promise<IUserResponse> {
+    try {
+      // call user service to find and update user id
+      const updatedUser = await this.userService.updateUserDetails(id, body);
+      console.log(updatedUser, 'updatedUser');
+      return {
+        message: 'Updated user details',
+        data: updatedUser,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.response);
+    }
+  }
+
+  @Delete('/:id')
+  async deleteUser(
+    @Param() { id }: getUserDetailsByidDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IUserResponse> {
+    try {
+      // call user service to find and delete user
+
+      const deletedUser = await this.userService.deleteUser(id);
+
+      if (!deletedUser.deletedCount) {
+        throw new BadRequestException('Incorrect user Id');
+      }
+      res.clearCookie('token');
+      res.clearCookie('refreshToken');
+      return {
+        message: 'user deleted',
       };
     } catch (err) {
       throw new BadRequestException(err.response);
