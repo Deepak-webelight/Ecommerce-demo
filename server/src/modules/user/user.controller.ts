@@ -13,7 +13,7 @@ import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
 import { PublicRoute } from '../../guards/auth.guard';
-import { appConfig, cookieConfiguration } from 'src/appConfig/configuration';
+import { cookieConfiguration } from 'src/appConfig/configuration';
 import { SuperAdmin } from 'src/guards/superAdmin.auth.guard';
 
 @Controller('/user')
