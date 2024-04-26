@@ -12,30 +12,31 @@ import { UserService } from './user.service';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
+import { PublicRoute } from '../../guards/auth.guard';
+import { cookieConfiguration } from 'src/appConfig/configuration';
+import { SuperAdmin } from 'src/guards/superAdmin.auth.guard';
 
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @PublicRoute()
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<IUserResponse> {
     try {
-      // call UserService to register the user
-      const { _id } = await this.userService.registerNewUser(body);
+      // call user service tp register new user
+      const { refreshToken, token } =
+        await this.userService.registerNewUser(body);
 
-      // call UserService to generate new tokens
-      const { token, refreshToken } = this.userService.generateTokens(_id);
-
-      res.cookie('token', tokenFormat(token), {
-        httpOnly: true,
-        sameSite: 'strict',
-      });
-      res.cookie('refreshToken', tokenFormat(refreshToken), {
-        httpOnly: true,
-        sameSite: 'strict',
-      });
+      res.cookie('token', tokenFormat(token), cookieConfiguration);
+      res.cookie(
+        'refreshToken',
+        tokenFormat(refreshToken),
+        cookieConfiguration,
+      );
 
       return {
         message: 'User Created Successfully',
@@ -46,6 +47,7 @@ export class UserController {
     }
   }
 
+  @PublicRoute()
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
@@ -53,19 +55,14 @@ export class UserController {
   ): Promise<IUserResponse> {
     try {
       // call user Service to authenticate user
-      const { _id } = await this.userService.authenticate(body);
+      const { refreshToken, token } = await this.userService.authenticate(body);
 
-      // call UserService to generate new tokens
-      const { token, refreshToken } = this.userService.generateTokens(_id);
-
-      res.cookie('token', tokenFormat(token), {
-        httpOnly: true,
-        sameSite: 'strict',
-      });
-      res.cookie('refreshToken', tokenFormat(refreshToken), {
-        httpOnly: true,
-        sameSite: 'strict',
-      });
+      res.cookie('token', tokenFormat(token), cookieConfiguration);
+      res.cookie(
+        'refreshToken',
+        tokenFormat(refreshToken),
+        cookieConfiguration,
+      );
 
       return {
         message: 'User Login Successfully',
@@ -81,7 +78,6 @@ export class UserController {
     try {
       res.clearCookie('token');
       res.clearCookie('refreshToken');
-
       return {
         message: 'User Logout Successfully',
         status: HttpStatus.OK,
@@ -100,13 +96,38 @@ export class UserController {
       // Call user service to refresh a new token
       const token = await this.userService.refreshToken(req);
 
-      res.cookie('token', tokenFormat(token), {
-        httpOnly: true,
-        sameSite: 'strict',
-      });
+      res.cookie('token', tokenFormat(token), cookieConfiguration);
       return {
         message: 'Token refreshed successfully',
         status: HttpStatus.OK,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
+  }
+
+  @PublicRoute()
+  @SuperAdmin()
+  @Post('/admin')
+  async createNewAdminUser(
+    @Body() body: SignUpRequestBodyDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IUserResponse> {
+    try {
+      // call User Service to varify and resister admin user
+      const { refreshToken, token } =
+        await this.userService.registerAdminUser(body);
+
+      res.cookie('token', tokenFormat(token), cookieConfiguration);
+      res.cookie(
+        'refreshToken',
+        tokenFormat(refreshToken),
+        cookieConfiguration,
+      );
+
+      return {
+        message: 'Admin User Created Successfully',
+        status: HttpStatus.CREATED,
       };
     } catch (error) {
       throw new BadRequestException(error.response);
