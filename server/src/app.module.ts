@@ -1,32 +1,39 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './modules/user/user.module';
-import configuration from './appConfig/configuration';
-import configValidation from './appConfig/configuration.validate';
 import { JwtModule } from '@nestjs/jwt';
-import { Iconfiguration } from './modules/user/user.interface';
+import { AuthGuard } from './guards/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/role-auth.guard';
+import { appConfig } from './appConfig/configuration';
+import { SuperAdminAuthGuard } from './guards/superAdmin.auth.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      validationSchema: configValidation,
-      load: [configuration],
-      isGlobal: true,
-    }),
-    JwtModule.registerAsync({
-      inject: [ConfigService],
+    JwtModule.register({
       global: true,
-      useFactory: (configService: ConfigService<Iconfiguration>) => ({
-        secret: configService.get('jwtSecret'),
-      }),
+      secret: appConfig.jwtSecret,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot(appConfig.mongodbUrl),
     userModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SuperAdminAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
