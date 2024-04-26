@@ -1,15 +1,15 @@
 import {
   Body,
   Controller,
-  HttpStatus,
   Post,
   Res,
   Req,
   BadRequestException,
   Get,
-  Param,
   Patch,
   Delete,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
@@ -17,67 +17,56 @@ import {
   LoginRequestDto,
   SignUpRequestBodyDto,
   UpdateUserDataRequestBodyDto,
-  getUserDetailsByIdDto,
 } from './user.dto';
 import { IUserResponse } from './user.interface';
-import { tokenFormat } from 'src/utils/constants';
 import { PublicRoute } from '../../guards/auth.guard';
-import { cookieConfiguration } from 'src/appConfig/configuration';
-import { SuperAdmin } from 'src/guards/superAdmin.auth.guard';
+import { SuperAdminAuthGuard } from '../../guards/superAdmin.auth.guard';
+import { User } from './user.model';
 
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
-  
   // create a new user
   @PublicRoute()
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<IUserResponse> {
+  ): Promise<IUserResponse<void>> {
     try {
-      // call user service tp register new user
-      const { refreshToken, token } =
-        await this.userService.registerNewUser(body);
-
-      res.cookie('token', tokenFormat(token), cookieConfiguration);
-      res.cookie(
-        'refreshToken',
-        tokenFormat(refreshToken),
-        cookieConfiguration,
-      );
-
-      return {
-        message: 'User Created Successfully',
-        status: HttpStatus.CREATED,
-      };
+      // call user service to register new user and allow authentication
+      return this.userService.registerUser(body, res);
     } catch (error) {
       throw new BadRequestException(error.response);
     }
   }
 
   // login an existing user
+  @PublicRoute()
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<IUserResponse> {
+  ): Promise<IUserResponse<void>> {
     try {
       // call user Service to authenticate user
-      const { refreshToken, token } = await this.userService.authenticate(body);
+      return this.userService.loginUser(body, res);
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
+  }
 
-      res.cookie('token', tokenFormat(token), cookieConfiguration);
-      res.cookie(
-        'refreshToken',
-        tokenFormat(refreshToken),
-        cookieConfiguration,
-      );
-
-      return {
-        message: 'User Login Successfully',
-        status: HttpStatus.OK,
-      };
+  // admin user
+  @PublicRoute()
+  @UseGuards(SuperAdminAuthGuard)
+  @Post('/admin')
+  async createNewAdminUser(
+    @Body() body: SignUpRequestBodyDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<IUserResponse<void>> {
+    try {
+      // call User Service to varify and resister admin user and allow authentication
+      return this.userService.registerAdminUser(body, res);
     } catch (error) {
       throw new BadRequestException(error.response);
     }
@@ -85,14 +74,9 @@ export class UserController {
 
   // logout an existing user
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     try {
-      res.clearCookie('token');
-      res.clearCookie('refreshToken');
-      return {
-        message: 'User Logout Successfully',
-        status: HttpStatus.OK,
-      };
+      return this.userService.logout(res);
     } catch (error) {
       throw new BadRequestException(error.response);
     }
@@ -100,78 +84,53 @@ export class UserController {
 
   // refresh an expired token
   @Post('refresh')
-  async refreshToken(
+  refreshToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<IUserResponse> {
+  ): IUserResponse<void> {
     try {
       // Call user service to refresh a new token
-      const token = await this.userService.refreshToken(req);
-
-      res.cookie('token', tokenFormat(token), cookieConfiguration);
-      return {
-        message: 'Token refreshed successfully',
-        status: HttpStatus.OK,
-      };
+      return this.userService.refreshToken(req, res);
     } catch (error) {
       throw new BadRequestException(error.response);
     }
   }
 
   // get user information by id
-  @Get(':id')
-  async getUserById(
-    @Param() { id }: getUserDetailsByIdDto,
-  ): Promise<IUserResponse> {
+  @Get()
+  async getUserById(@Query('id') id: string): Promise<IUserResponse<User>> {
     try {
       // call user service to extract user information
-      const user = await this.userService.getUserById(id);
-
-      return {
-        message: 'User information fetched successfully',
-        data: user,
-        status: HttpStatus.OK,
-      };
+      return this.userService.getUserById(id);
     } catch (err) {
-      throw new BadRequestException(err.response);
+      throw new BadRequestException(err);
     }
   }
-  @Patch(':id')
+
+  // update user details
+  @Patch()
   async updateUserDetails(
-    @Param() { id }: getUserDetailsByIdDto,
+    @Query('id') id: string,
     @Body() body: UpdateUserDataRequestBodyDto,
-  ): Promise<IUserResponse> {
+  ): Promise<IUserResponse<User>> {
     try {
       // call user service to find and update user id
-      const updatedUser = await this.userService.updateUserDetails(id, body);
-      console.log(updatedUser, 'updatedUser');
-      return {
-        message: 'Updated user details',
-        data: updatedUser,
-      };
+      return this.userService.updateUserDetails(id, body);
     } catch (err) {
-      throw new BadRequestException(err.response);
+      console.log(err);
+      throw new BadRequestException(err);
     }
   }
 
-  @Delete('/:id')
+  // delete user
+  @Delete()
   async deleteUser(
-    @Param() { id }: getUserDetailsByIdDto,
+    @Query('id') id: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<IUserResponse> {
+  ): Promise<IUserResponse<void>> {
     try {
       // call user service to find and delete user
-
-      const deletedUser = await this.userService.deleteUser(id);
-
-      if (!deletedUser.deletedCount) {
-        throw new BadRequestException('Incorrect user Id');
-      }
-      res.clearCookie('token');
-      res.clearCookie('refreshToken');
-      return {
-        message: 'user deleted',
-      };
+      return this.userService.deleteUser(id, res);
     } catch (err) {
       throw new BadRequestException(err.response);
     }

@@ -28,10 +28,6 @@ export class LoginRequestDto {
   readonly password: string;
 }
 
-export class getUserDetailsByIdDto {
-  @IsNotEmpty()
-  id: string;
-}
 export class UpdateUserDataRequestBodyDto {
   @IsOptional()
   @IsString()

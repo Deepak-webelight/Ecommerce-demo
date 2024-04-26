@@ -3,14 +3,14 @@ import {
   ExecutionContext,
   Injectable,
   SetMetadata,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { IsPublicKey } from 'src/utils/constants';
+import { GuardErrorResponse } from '../intercepter/response.intercepter';
+import { IsPublicKey } from '../utils/constants';
 
-// auth guard
+// To not byPass Authguard
 export const PublicRoute = () => SetMetadata(IsPublicKey, true);
 
 @Injectable()
@@ -20,19 +20,18 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // for public use only
+    // public routes
     const isPublic = this.reflector.getAllAndOverride<boolean>(IsPublicKey, [
       context.getHandler(),
       context.getClass(),
     ]);
 
-    if (isPublic) {
-      return true;
-    }
+    if (isPublic) return true;
+
+    // private routes
 
     // switch context to request
     const req: Request = context.switchToHttp().getRequest();
-
     try {
       //   Extract token from request
       const token = this.extractTokenFromHeader(req);
@@ -43,7 +42,7 @@ export class AuthGuard implements CanActivate {
       req['user'] = verifyToken;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Access Denied: Invalid token');
+      throw new GuardErrorResponse('Access Denied: Invalid token');
     }
   }
 
@@ -54,7 +53,7 @@ export class AuthGuard implements CanActivate {
     if (type === 'Bearer' && token) {
       return token;
     } else {
-      throw new UnauthorizedException('Token not found');
+      throw new GuardErrorResponse('Token not found');
     }
   }
 }
