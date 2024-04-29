@@ -28,13 +28,7 @@ export class ProductController {
   ): Promise<IproductsRouteResponse> {
     try {
       // Call product service to get filtered products
-      const products = await this.productservice.getFilterProducts(query, body);
-
-      return {
-        data: products,
-        message: 'all filter products fetched successfully',
-        statusCode: HttpStatus.OK,
-      };
+      return this.productservice.getFilterProducts(query, body);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -46,13 +40,7 @@ export class ProductController {
   ): Promise<IproductsRouteResponse> {
     try {
       // Call product service to create product
-      const product = await this.productservice.createProduct(body);
-
-      return {
-        data: product,
-        message: 'product created successfully',
-        statusCode: HttpStatus.CREATED,
-      };
+      return this.productservice.createProduct(body);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -64,13 +52,7 @@ export class ProductController {
   ): Promise<IproductsRouteResponse> {
     try {
       // call product service to extract product data
-      const product = await this.productservice.getProductDataById(id);
-
-      return {
-        message: 'product data',
-        data: product,
-        statusCode: HttpStatus.OK,
-      };
+      return this.productservice.getProductDataById(id);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -81,14 +63,7 @@ export class ProductController {
   ): Promise<IproductsRouteResponse> {
     try {
       // call product service to extract product data
-      const product = await this.productservice.deleteProductDataById(id);
-
-      console.log(product);
-       
-      return {
-        message: 'product deleted successfully',
-        statusCode: HttpStatus.OK,
-      };
+      return this.productservice.deleteProductDataById(id);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
