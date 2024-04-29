@@ -3,6 +3,7 @@ import * as cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+import { appConfig } from './appConfig/configuration';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
@@ -12,6 +13,6 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  await app.listen(5000);
+  await app.listen(appConfig.port);
 }
 bootstrap();

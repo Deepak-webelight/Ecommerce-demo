@@ -19,9 +19,11 @@ export class SignUpRequestBodyDto {
 }
 
 export class LoginRequestDto {
+  @IsNotEmpty()
   @IsEmail()
   readonly email: string;
 
-  @IsStrongPassword()
+  @IsString()
+  @IsNotEmpty()
   readonly password: string;
 }

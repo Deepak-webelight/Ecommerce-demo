@@ -1,18 +1,17 @@
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import mongoose, { Model } from 'mongoose';
-import { ConfigService } from '@nestjs/config';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
-import { Iconfiguration } from './user.interface';
+import { Role } from '../../guards/role-auth.guard';
+import { RefreshTokenExpiry, TokenExpiry } from 'src/utils/constants';
 
 @Injectable()
 export class UserService {
   constructor(
-    private configService: ConfigService<Iconfiguration>,
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
@@ -29,35 +28,35 @@ export class UserService {
       // create a new hashpassword for the user
       const userHashedPassword = await createHashPassword(password);
 
-      const user = await this.userModel.create({
+      const { _id, role } = await this.userModel.create({
         email,
         name,
         password: userHashedPassword,
       });
-
-      return user;
+      // call generateTokens to return the tokens
+      return this.generateTokens(_id, role);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
   async isExist(email: string) {
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.exists({ email });
     if (user) {
       return true;
     } else {
       return false;
     }
   }
-  generateTokens(userId: mongoose.Types.ObjectId) {
+  generateTokens(userId: Types.ObjectId, role: number) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
-      { userId: userId },
-      { expiresIn: this.configService.get('tokenExpiry') },
+      { userId, role },
+      { expiresIn: TokenExpiry },
     );
     const refreshToken = this.jwtService.sign(
-      { userId: userId },
+      { userId, role },
       {
-        expiresIn: this.configService.get('refreshTokenExpiry'),
+        expiresIn: RefreshTokenExpiry,
       },
     );
 
@@ -82,7 +81,7 @@ export class UserService {
         throw new BadRequestException('Invalid password');
       }
 
-      return user;
+      return this.generateTokens(user._id, user.role);
     } catch (err) {
       throw new BadRequestException(err.message || 'Authentication failed');
     }
@@ -90,21 +89,42 @@ export class UserService {
 
   async refreshToken(req: Request) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-      console.log(req.cookies);
-
-      if (!refreshToken) {
-        throw new BadRequestException('No refresh token provided');
-      }
-
-      const { userId } = this.jwtService.verify(refreshToken);
+      const { userId, role } = req['user'];
 
       const token = this.jwtService.sign(
-        { userId },
-        { expiresIn: this.configService.get('tokenExpiry') },
+        { userId, role },
+        { expiresIn: TokenExpiry },
       );
 
       return token;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async registerAdminUser(body: SignUpRequestBodyDto) {
+    try {
+      // extract data from request body
+      const { email, name, password } = body;
+
+      // if User already has existing
+      const adminUser = await this.isExist(email);
+
+      if (adminUser) {
+        throw new BadRequestException('User already exists');
+      }
+
+      // hash password
+      const hashpassword = await createHashPassword(password);
+
+      const { _id, role } = await this.userModel.create({
+        name,
+        email,
+        password: hashpassword,
+        role: Role.Admin,
+      });
+
+      return this.generateTokens(_id, role);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
