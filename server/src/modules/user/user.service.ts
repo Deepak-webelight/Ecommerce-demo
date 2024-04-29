@@ -11,6 +11,7 @@ import {
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from '../../utils/bycrpt';
 import {
+  ITokenBody,
   IUpdateUserDetailsfilter,
   IauthResponseCookies,
 } from './user.interface';
@@ -131,9 +132,11 @@ export class UserService {
     };
   }
 
-  async getUserById(id: string) {
-    if (!id) throw new BadRequestException('id cannot be empty');
-    const user = await this.userModel.findById(id, {
+  async getUserById(req: Request) {
+    const { userId } = req['user'] as ITokenBody;
+
+    if (!userId) throw new BadRequestException('id cannot be empty');
+    const user = await this.userModel.findById(userId, {
       _id: 0,
       role: 0,
       password: 0,
@@ -150,8 +153,10 @@ export class UserService {
     };
   }
 
-  async updateUserDetails(id: string, body: UpdateUserDataRequestBodyDto) {
-    if (!id) throw new BadRequestException('id cannot be empty');
+  async updateUserDetails(req: Request, body: UpdateUserDataRequestBodyDto) {
+    const { userId } = req['user'] as ITokenBody;
+
+    if (!userId) throw new BadRequestException('id cannot be empty');
 
     const { name, password } = body;
 
@@ -164,7 +169,7 @@ export class UserService {
     }
 
     const updatedUser = await this.userModel
-      .findOneAndUpdate({ _id: id }, filterObject, { new: true })
+      .findOneAndUpdate({ _id: userId }, filterObject, { new: true })
       .select('-_id')
       .select('-password')
       .select('-role');
@@ -215,10 +220,13 @@ export class UserService {
       statusCode: HttpStatus.CREATED,
     };
   }
-  async deleteUser(id: string, res: Response) {
-    if (!id) throw new BadRequestException('id cannot be empty');
 
-    const deletedUser = await this.userModel.deleteOne({ _id: id });
+  async deleteUser(req: Request, res: Response) {
+    const { userId } = req['user'] as ITokenBody;
+
+    if (!userId) throw new BadRequestException('id cannot be empty');
+
+    const deletedUser = await this.userModel.deleteOne({ _id: userId });
 
     if (!deletedUser.deletedCount) {
       throw new BadRequestException('Incorrect user Id');
@@ -230,6 +238,7 @@ export class UserService {
       statusCode: HttpStatus.OK,
     };
   }
+
   authResponseCookies(data: IauthResponseCookies) {
     const { res, refreshToken, token } = data;
     if (token) res.cookie('token', tokenFormat(token), cookieConfiguration);
@@ -240,6 +249,7 @@ export class UserService {
         cookieConfiguration,
       );
   }
+  
   logout(res: Response) {
     res.clearCookie('token');
     res.clearCookie('refreshToken');

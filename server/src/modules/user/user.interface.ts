@@ -14,3 +14,10 @@ export interface IauthResponseCookies {
   refreshToken?: string;
   res: Response;
 }
+
+export interface ITokenBody {
+  userId: string;
+  role: number;
+  iat: number;
+  exp: number;
+}

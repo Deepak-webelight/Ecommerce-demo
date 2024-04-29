@@ -9,7 +9,6 @@ import {
   Patch,
   Delete,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
@@ -19,15 +18,15 @@ import {
   UpdateUserDataRequestBodyDto,
 } from './user.dto';
 import { IUserResponse } from './user.interface';
-import { PublicRoute } from '../../guards/auth.guard';
 import { SuperAdminAuthGuard } from '../../guards/superAdmin.auth.guard';
 import { User } from './user.model';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
+  
   // create a new user
-  @PublicRoute()
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
@@ -42,7 +41,6 @@ export class UserController {
   }
 
   // login an existing user
-  @PublicRoute()
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
@@ -57,9 +55,8 @@ export class UserController {
   }
 
   // admin user
-  @PublicRoute()
-  @UseGuards(SuperAdminAuthGuard)
   @Post('/admin')
+  @UseGuards(SuperAdminAuthGuard)
   async createNewAdminUser(
     @Body() body: SignUpRequestBodyDto,
     @Res({ passthrough: true }) res: Response,
@@ -74,7 +71,8 @@ export class UserController {
 
   // logout an existing user
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
+  @UseGuards(AuthGuard)
+  async logout(@Res({ passthrough: true }) res: Response) {
     try {
       return this.userService.logout(res);
     } catch (error) {
@@ -84,10 +82,11 @@ export class UserController {
 
   // refresh an expired token
   @Post('refresh')
-  refreshToken(
+  @UseGuards(AuthGuard)
+  async refreshToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): IUserResponse<void> {
+  ): Promise<IUserResponse<void>> {
     try {
       // Call user service to refresh a new token
       return this.userService.refreshToken(req, res);
@@ -96,12 +95,13 @@ export class UserController {
     }
   }
 
-  // get user information by id
+  // get user details by id
   @Get()
-  async getUserById(@Query('id') id: string): Promise<IUserResponse<User>> {
+  @UseGuards(AuthGuard)
+  async getUserById(@Req() req: Request): Promise<IUserResponse<User>> {
     try {
       // call user service to extract user information
-      return this.userService.getUserById(id);
+      return this.userService.getUserById(req);
     } catch (err) {
       throw new BadRequestException(err);
     }
@@ -109,13 +109,14 @@ export class UserController {
 
   // update user details
   @Patch()
+  @UseGuards(AuthGuard)
   async updateUserDetails(
-    @Query('id') id: string,
+    @Req() req: Request,
     @Body() body: UpdateUserDataRequestBodyDto,
   ): Promise<IUserResponse<User>> {
     try {
       // call user service to find and update user id
-      return this.userService.updateUserDetails(id, body);
+      return this.userService.updateUserDetails(req, body);
     } catch (err) {
       console.log(err);
       throw new BadRequestException(err);
@@ -124,13 +125,14 @@ export class UserController {
 
   // delete user
   @Delete()
+  @UseGuards(AuthGuard)
   async deleteUser(
-    @Query('id') id: string,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<IUserResponse<void>> {
     try {
       // call user service to find and delete user
-      return this.userService.deleteUser(id, res);
+      return this.userService.deleteUser(req, res);
     } catch (err) {
       throw new BadRequestException(err.response);
     }
