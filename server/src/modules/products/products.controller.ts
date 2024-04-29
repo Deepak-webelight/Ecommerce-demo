@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { IproductsRouteResponse } from './products.interface';
@@ -36,9 +37,9 @@ export class ProductController {
     }
   }
 
-  @Post()
-  @Roles(Role.Admin)
   @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @Post()
   async createProduct(
     @Body() body: ProductRequestBodyDto,
   ): Promise<IproductsRouteResponse> {

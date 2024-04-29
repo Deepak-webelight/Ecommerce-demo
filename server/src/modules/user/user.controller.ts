@@ -12,7 +12,7 @@ import { UserService } from './user.service';
 import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
 import { IUserResponse } from './user.interface';
 import { tokenFormat } from 'src/utils/constants';
-import { PublicRoute } from '../../guards/auth.guard';
+// import { PublicRoute } from '../../guards/auth.guard';
 import { cookieConfiguration } from 'src/appConfig/configuration';
 import { SuperAdmin } from 'src/guards/superAdmin.auth.guard';
 
@@ -20,7 +20,7 @@ import { SuperAdmin } from 'src/guards/superAdmin.auth.guard';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @PublicRoute()
+  // @PublicRoute()
   @Post('sign-up')
   async signup(
     @Body() body: SignUpRequestBodyDto,
@@ -47,7 +47,7 @@ export class UserController {
     }
   }
 
-  @PublicRoute()
+  // @PublicRoute()
   @Post('login')
   async login(
     @Body() body: LoginRequestDto,
@@ -106,7 +106,7 @@ export class UserController {
     }
   }
 
-  @PublicRoute()
+  // @PublicRoute()
   @SuperAdmin()
   @Post('/admin')
   async createNewAdminUser(
