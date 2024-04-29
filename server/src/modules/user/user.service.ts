@@ -60,6 +60,7 @@ export class UserService {
       statusCode: HttpStatus.CREATED,
     };
   }
+
   async isExist(email: string) {
     const user = await this.userModel.exists({ email });
     if (user) {
@@ -68,6 +69,7 @@ export class UserService {
       return false;
     }
   }
+  
   generateTokens(userId: Types.ObjectId, role: number) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
@@ -249,7 +251,7 @@ export class UserService {
         cookieConfiguration,
       );
   }
-  
+
   logout(res: Response) {
     res.clearCookie('token');
     res.clearCookie('refreshToken');

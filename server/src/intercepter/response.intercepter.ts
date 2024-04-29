@@ -10,7 +10,7 @@ import {
 import { map, catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 
-// Response by routes 
+// Response by routes
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, { data: T }> {
   intercept(
@@ -21,7 +21,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, { data: T }> {
   }
 }
 
-// Error thrown by routes 
+// Error thrown by routes
 @Injectable()
 export class ErrorsResponseInterceptor<T>
   implements NestInterceptor<T, { error: any }>
@@ -33,12 +33,13 @@ export class ErrorsResponseInterceptor<T>
     return next.handle().pipe(
       catchError((err) =>
         throwError(
-          new BadGatewayException({
-            error: {
-              message: err.message || 'Internal server error',
-              statusCode: err.status || 500,
-            },
-          }),
+          () =>
+            new BadGatewayException({
+              error: {
+                message: err.message || 'Internal server error',
+                statusCode: err.status || 500,
+              },
+            }),
         ),
       ),
     );
