@@ -28,6 +28,7 @@
     - /updateCartCount/:id          :   // Increment or decrement product count
     
 - Checkout process.
+<<<<<<< HEAD
     - /checkout/:id                 :   // check out products in cart
     - /payment/:id                  :   // payment for the product
     - /cancelOrder/:id              :   // cancel order 
@@ -35,3 +36,16 @@
 - User-specific order history.
     - /OrderHistory/:id             :   // get order history
     - /OrderDetails/:id             :   // get order details by ID
+=======
+- User-specific order history.
+
+
+
+guest : nothing : sighup or login k liye
+user : token only ye all roures required token 
+admin : token and x-api-key 
+
+
+superAdminAuthGuard : --> 
+authguard : token and x-api-key
+>>>>>>> nestjs-conversion

@@ -1,12 +1,8 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RolesKey } from 'src/utils/constants';
+import { GuardErrorResponse } from '../intercepter/response.intercepter';
+import { RolesKey } from '../utils/constants';
 
 export enum Role {
   User,
@@ -34,7 +30,7 @@ export class RolesGuard implements CanActivate {
       console.log(user);
       return requiredRoles === user.role;
     } catch (err) {
-      throw new UnauthorizedException('Access denied: Forbidden');
+      throw new GuardErrorResponse('Access denied: Forbidden');
     }
   }
 }
