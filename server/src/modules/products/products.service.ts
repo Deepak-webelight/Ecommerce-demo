@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { products } from './products.model';
 import { Model } from 'mongoose';
@@ -14,7 +13,6 @@ import { defaultPageLimit, defaultPageNumber } from 'src/utils/constants';
 @Injectable()
 export class ProductService {
   constructor(
-    private configService: ConfigService,
     @InjectModel(products.name) private productsModel: Model<products>,
   ) {}
   async getFilterProducts(query: PaginationDto, body: FilterRequestBodyDto) {

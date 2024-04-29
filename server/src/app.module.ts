@@ -27,10 +27,6 @@ import { SuperAdminAuthGuard } from './guards/superAdmin.auth.guard';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
       useClass: RolesGuard,
     },
     {
