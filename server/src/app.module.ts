@@ -4,11 +4,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './modules/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthGuard } from './guards/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './guards/role-auth.guard';
 import { appConfig } from './appConfig/configuration';
-import { SuperAdminAuthGuard } from './guards/superAdmin.auth.guard';
+import {
+  ErrorsResponseInterceptor,
+  ResponseInterceptor,
+} from './intercepter/response.intercepter';
 
 @Module({
   imports: [
@@ -24,15 +26,15 @@ import { SuperAdminAuthGuard } from './guards/superAdmin.auth.guard';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
       useClass: RolesGuard,
     },
     {
-      provide: APP_GUARD,
-      useClass: SuperAdminAuthGuard,
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ErrorsResponseInterceptor,
     },
   ],
 })

@@ -9,3 +9,13 @@
 - Cart functionality (add/remove items).
 - Checkout process.
 - User-specific order history.
+
+
+
+guest : nothing : sighup or login k liye
+user : token only ye all roures required token 
+admin : token and x-api-key 
+
+
+superAdminAuthGuard : --> 
+authguard : token and x-api-key

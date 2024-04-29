@@ -6,7 +6,7 @@ export const appConfig = {
   port: process.env.PORT,
   mongodbUrl: process.env.MONGODB_URL,
   jwtSecret: process.env.JWT_SECRET,
-  xApiKey: process.env.X_API_KEY,
+  adminApiKey: process.env.ADMIN_API_KEY,
 };
 
 export const cookieConfiguration: CookieOptions = {

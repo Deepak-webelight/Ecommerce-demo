@@ -1,13 +1,27 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoginRequestDto, SignUpRequestBodyDto } from './user.dto';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  LoginRequestDto,
+  SignUpRequestBodyDto,
+  UpdateUserDataRequestBodyDto,
+} from './user.dto';
 import { User } from './user.model';
-import { createHashPassword, verifyPassword } from 'src/utils/bycrpt';
+import { createHashPassword, verifyPassword } from '../../utils/bycrpt';
+import {
+  ITokenBody,
+  IUpdateUserDetailsfilter,
+  IauthResponseCookies,
+} from './user.interface';
 import { Role } from '../../guards/role-auth.guard';
-import { RefreshTokenExpiry, TokenExpiry } from 'src/utils/constants';
+import {
+  RefreshTokenExpiry,
+  TokenExpiry,
+  tokenFormat,
+} from '../../utils/constants';
+import { cookieConfiguration } from '../../appConfig/configuration';
 
 @Injectable()
 export class UserService {
@@ -16,29 +30,37 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async registerNewUser(body: SignUpRequestBodyDto) {
-    try {
-      // Extract data from request body
-      const { name, email, password } = body;
+  async registerUser(body: SignUpRequestBodyDto, res: Response) {
+    // Extract data from request body
+    const { name, email, password } = body;
 
-      // Validate does user exist
-      const isexist = await this.isExist(email);
-      if (isexist) throw new BadRequestException('User already exists');
+    // Validate does user exist
+    const isexist = await this.isExist(email);
+    if (isexist) throw new BadRequestException('User already exists');
 
-      // create a new hashpassword for the user
-      const userHashedPassword = await createHashPassword(password);
+    // create a new hashpassword for the user
+    const userHashedPassword = await createHashPassword(password);
 
-      const { _id, role } = await this.userModel.create({
-        email,
-        name,
-        password: userHashedPassword,
-      });
-      // call generateTokens to return the tokens
-      return this.generateTokens(_id, role);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    const { _id, role } = await this.userModel.create({
+      email,
+      name,
+      password: userHashedPassword,
+    });
+    // call generateTokens to return the tokens
+    const { refreshToken, token } = this.generateTokens(_id, role);
+
+    // call user service to send cookie
+    this.authResponseCookies({
+      res,
+      refreshToken,
+      token,
+    });
+    return {
+      message: 'Signup Successfully',
+      statusCode: HttpStatus.CREATED,
+    };
   }
+
   async isExist(email: string) {
     const user = await this.userModel.exists({ email });
     if (user) {
@@ -47,6 +69,7 @@ export class UserService {
       return false;
     }
   }
+  
   generateTokens(userId: Types.ObjectId, role: number) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
@@ -63,70 +86,178 @@ export class UserService {
     return { token, refreshToken };
   }
 
-  async authenticate(body: LoginRequestDto) {
-    try {
-      const { email, password } = body;
+  async loginUser(body: LoginRequestDto, res: Response) {
+    const { email, password } = body;
 
-      // Check if the user exists
-      const user = await this.userModel.findOne({ email });
+    // get user details
+    const user = await this.userModel.findOne({ email });
 
-      if (!user) {
-        throw new BadRequestException('User not found');
-      }
-
-      // Verify the password
-      const isPasswordValid = await verifyPassword(password, user.password);
-
-      if (!isPasswordValid) {
-        throw new BadRequestException('Invalid password');
-      }
-
-      return this.generateTokens(user._id, user.role);
-    } catch (err) {
-      throw new BadRequestException(err.message || 'Authentication failed');
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
+
+    // Verify the password
+    const isPasswordValid = await verifyPassword(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid password');
+    }
+
+    const { refreshToken, token } = this.generateTokens(user._id, user.role);
+
+    // call user service to send cookie
+    this.authResponseCookies({
+      res,
+      token,
+      refreshToken,
+    });
+    return {
+      message: 'Login Successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 
-  async refreshToken(req: Request) {
-    try {
-      const { userId, role } = req['user'];
+  refreshToken(req: Request, res: Response) {
+    const { userId, role } = req['user'];
+    const token = this.jwtService.sign(
+      { userId, role },
+      { expiresIn: TokenExpiry },
+    );
+    this.authResponseCookies({
+      res,
+      token,
+    });
 
-      const token = this.jwtService.sign(
-        { userId, role },
-        { expiresIn: TokenExpiry },
-      );
-
-      return token;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return {
+      message: 'Token refreshed successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 
-  async registerAdminUser(body: SignUpRequestBodyDto) {
-    try {
-      // extract data from request body
-      const { email, name, password } = body;
+  async getUserById(req: Request) {
+    const { userId } = req['user'] as ITokenBody;
 
-      // if User already has existing
-      const adminUser = await this.isExist(email);
+    if (!userId) throw new BadRequestException('id cannot be empty');
+    const user = await this.userModel.findById(userId, {
+      _id: 0,
+      role: 0,
+      password: 0,
+    });
 
-      if (adminUser) {
-        throw new BadRequestException('User already exists');
-      }
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
 
-      // hash password
+    return {
+      message: 'User information fetched successfully',
+      data: user,
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async updateUserDetails(req: Request, body: UpdateUserDataRequestBodyDto) {
+    const { userId } = req['user'] as ITokenBody;
+
+    if (!userId) throw new BadRequestException('id cannot be empty');
+
+    const { name, password } = body;
+
+    const filterObject: IUpdateUserDetailsfilter = {};
+    if (name) filterObject.name = name;
+
+    if (password) {
       const hashpassword = await createHashPassword(password);
-
-      const { _id, role } = await this.userModel.create({
-        name,
-        email,
-        password: hashpassword,
-        role: Role.Admin,
-      });
-
-      return this.generateTokens(_id, role);
-    } catch (err) {
-      throw new BadRequestException(err.message);
+      filterObject.password = hashpassword;
     }
+
+    const updatedUser = await this.userModel
+      .findOneAndUpdate({ _id: userId }, filterObject, { new: true })
+      .select('-_id')
+      .select('-password')
+      .select('-role');
+
+    if (!updatedUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    return {
+      message: 'Updated user details',
+      data: updatedUser,
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async registerAdminUser(body: SignUpRequestBodyDto, res: Response) {
+    // extract data from request body
+    const { email, name, password } = body;
+
+    // if User already has existing
+    const adminUser = await this.isExist(email);
+
+    if (adminUser) {
+      throw new BadRequestException('User already exists');
+    }
+
+    // hash password
+    const hashpassword = await createHashPassword(password);
+
+    const { _id, role } = await this.userModel.create({
+      name,
+      email,
+      password: hashpassword,
+      role: Role.Admin,
+    });
+
+    const { refreshToken, token } = this.generateTokens(_id, role);
+
+    // call user service to send cookie
+    this.authResponseCookies({
+      res,
+      token,
+      refreshToken,
+    });
+
+    return {
+      message: 'Admin Created Successfully',
+      statusCode: HttpStatus.CREATED,
+    };
+  }
+
+  async deleteUser(req: Request, res: Response) {
+    const { userId } = req['user'] as ITokenBody;
+
+    if (!userId) throw new BadRequestException('id cannot be empty');
+
+    const deletedUser = await this.userModel.deleteOne({ _id: userId });
+
+    if (!deletedUser.deletedCount) {
+      throw new BadRequestException('Incorrect user Id');
+    }
+    res.clearCookie('token');
+    res.clearCookie('refreshToken');
+    return {
+      message: 'user deleted',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  authResponseCookies(data: IauthResponseCookies) {
+    const { res, refreshToken, token } = data;
+    if (token) res.cookie('token', tokenFormat(token), cookieConfiguration);
+    if (refreshToken)
+      res.cookie(
+        'refreshToken',
+        tokenFormat(refreshToken),
+        cookieConfiguration,
+      );
+  }
+
+  logout(res: Response) {
+    res.clearCookie('token');
+    res.clearCookie('refreshToken');
+    return {
+      message: 'User Logout Successfully',
+      statusCode: HttpStatus.OK,
+    };
   }
 }
