@@ -11,13 +11,31 @@ import { map, catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 
 // Response by routes
+
+interface IApiResponse<T> {
+  statusCode: number;
+  data: {
+    message: string;
+    data: T;
+  };
+}
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, { data: T }> {
+export class ResponseInterceptor<T>
+  implements NestInterceptor<IApiResponse<T>>
+{
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<{ data: T }> {
-    return next.handle().pipe(map((data) => ({ data })));
+  ): Observable<IApiResponse<T>> {
+    return next.handle().pipe(
+      map((response) => ({
+        data: {
+          data: response.data,
+          message: response.message,
+        },
+        statusCode: response.statusCode,
+      })),
+    );
   }
 }
 
@@ -37,8 +55,8 @@ export class ErrorsResponseInterceptor<T>
             new BadGatewayException({
               error: {
                 message: err.message || 'Internal server error',
-                statusCode: err.status || 500,
               },
+              statusCode: err.status || 500,
             }),
         ),
       ),
@@ -51,6 +69,6 @@ export class GuardErrorResponse extends HttpException {
     message: string,
     statusCode: HttpStatus = HttpStatus.UNAUTHORIZED,
   ) {
-    super({ error: { message, statusCode } }, statusCode);
+    super({ error: { message }, statusCode }, statusCode);
   }
 }

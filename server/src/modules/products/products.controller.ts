@@ -8,7 +8,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { IproductsRouteResponse } from './products.interface';
@@ -17,7 +16,7 @@ import {
   ProductRequestBodyDto,
   PaginationDto,
 } from './products.dto';
-import { Role, Roles } from 'src/guards/role-auth.guard';
+import { Role, RolesGuard } from 'src/guards/role-auth.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('/products')
@@ -37,9 +36,9 @@ export class ProductController {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Roles(Role.Admin)
+  // create products
   @Post()
+  @UseGuards(AuthGuard, new RolesGuard(Role.Admin))
   async createProduct(
     @Body() body: ProductRequestBodyDto,
   ): Promise<IproductsRouteResponse> {
@@ -51,6 +50,7 @@ export class ProductController {
     }
   }
 
+  // Get product data by id
   @Get('/:id')
   async getProductById(
     @Param('id') id: string,
@@ -63,7 +63,9 @@ export class ProductController {
     }
   }
 
+  // delete by id
   @Delete('/:id')
+  @UseGuards(AuthGuard, new RolesGuard(Role.Admin))
   async deleteProductById(
     @Param('id') id: string,
   ): Promise<IproductsRouteResponse> {

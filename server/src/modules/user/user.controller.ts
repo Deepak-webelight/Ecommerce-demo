@@ -18,9 +18,6 @@ import {
   UpdateUserDataRequestBodyDto,
 } from './user.dto';
 import { IUserResponse } from './user.interface';
-import { tokenFormat } from 'src/utils/constants';
-// import { PublicRoute } from '../../guards/auth.guard';
-import { cookieConfiguration } from 'src/appConfig/configuration';
 import { SuperAdminAuthGuard } from '../../guards/superAdmin.auth.guard';
 import { User } from './user.model';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -28,7 +25,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
-  
+
   // create a new user
   @Post('sign-up')
   async signup(
