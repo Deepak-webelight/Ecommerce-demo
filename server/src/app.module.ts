@@ -22,6 +22,7 @@ import {
     userModule,
     productModule,
   ],
+
   controllers: [AppController],
   providers: [
     AppService,
