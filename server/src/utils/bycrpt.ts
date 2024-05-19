@@ -1,4 +1,4 @@
-import { hash, compare, genSalt } from "bcryptjs";
+import { hash, compare, genSalt } from 'bcryptjs';
 
 export const createHashPassword = async (password: string): Promise<string> => {
   try {
@@ -10,7 +10,7 @@ export const createHashPassword = async (password: string): Promise<string> => {
 };
 export const verifyPassword = (
   plainPassword: string,
-  hashedPassword: string
+  hashedPassword: string,
 ) => {
   try {
     return compare(plainPassword, hashedPassword);

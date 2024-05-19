@@ -16,7 +16,8 @@ export class AuthGuard implements CanActivate {
       //  verify token
       const verifyToken = await this.jwtService.verify(token);
 
-      req['user'] = verifyToken;
+      req['userId'] = verifyToken.userId;
+      req['role'] = verifyToken.role;
       return true;
     } catch (error) {
       throw new GuardErrorResponse('Access Denied: Invalid token');

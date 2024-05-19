@@ -11,7 +11,6 @@ import {
 import { User } from './user.model';
 import { createHashPassword, verifyPassword } from '../../utils/bycrpt';
 import {
-  ITokenBody,
   IUpdateUserDetailsfilter,
   IauthResponseCookies,
 } from './user.interface';
@@ -69,7 +68,7 @@ export class UserService {
       return false;
     }
   }
-  
+
   generateTokens(userId: Types.ObjectId, role: number) {
     // generate new token and refresh token
     const token = this.jwtService.sign(
@@ -118,7 +117,9 @@ export class UserService {
   }
 
   refreshToken(req: Request, res: Response) {
-    const { userId, role } = req['user'];
+    const userId = req['userId'];
+    const role = req['role'];
+
     const token = this.jwtService.sign(
       { userId, role },
       { expiresIn: TokenExpiry },
@@ -135,7 +136,7 @@ export class UserService {
   }
 
   async getUserById(req: Request) {
-    const { userId } = req['user'] as ITokenBody;
+    const userId = req['userId'];
 
     if (!userId) throw new BadRequestException('id cannot be empty');
     const user = await this.userModel.findById(userId, {
@@ -156,7 +157,7 @@ export class UserService {
   }
 
   async updateUserDetails(req: Request, body: UpdateUserDataRequestBodyDto) {
-    const { userId } = req['user'] as ITokenBody;
+    const userId = req['userId'];
 
     if (!userId) throw new BadRequestException('id cannot be empty');
 
@@ -224,8 +225,7 @@ export class UserService {
   }
 
   async deleteUser(req: Request, res: Response) {
-    const { userId } = req['user'] as ITokenBody;
-
+    const userId = req['userId'];
     if (!userId) throw new BadRequestException('id cannot be empty');
 
     const deletedUser = await this.userModel.deleteOne({ _id: userId });

@@ -4,8 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { userModule } from './modules/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { RolesGuard } from './guards/role-auth.guard';
+import { productModule } from './modules/products/products.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { appConfig } from './appConfig/configuration';
 import {
   ErrorsResponseInterceptor,
@@ -20,14 +20,12 @@ import {
     }),
     MongooseModule.forRoot(appConfig.mongodbUrl),
     userModule,
+    productModule,
   ],
+
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,

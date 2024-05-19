@@ -25,7 +25,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 @Controller('/user')
 export class UserController {
   constructor(private userService: UserService) {}
-  
+
   // create a new user
   @Post('sign-up')
   async signup(

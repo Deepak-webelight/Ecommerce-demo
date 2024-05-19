@@ -13,4 +13,3 @@ export const cookieConfiguration: CookieOptions = {
   httpOnly: true,
   sameSite: 'strict',
 };
-
